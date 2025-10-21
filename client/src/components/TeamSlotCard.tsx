@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { CoromonSelector } from "./CoromonSelector";
 import { SpriteImage } from "./SpriteImage";
-import { PotentLevel, SpecialSkin, generateSpritePath } from "@shared/coromon-data";
+import { PotentLevel, SpecialSkin, generateSpritePath, getAvailableSkinsForCoromon } from "@shared/coromon-data";
 import { Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -130,14 +130,11 @@ export function TeamSlotCard({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="None">None</SelectItem>
-                <SelectItem value="Crimsonite">Crimsonite</SelectItem>
-                <SelectItem value="Retro">Retro</SelectItem>
-                <SelectItem value="Dino">Dino</SelectItem>
-                <SelectItem value="Chunky">Chunky</SelectItem>
-                <SelectItem value="Robot">Robot</SelectItem>
-                <SelectItem value="Steampunk">Steampunk</SelectItem>
-                <SelectItem value="Galactic">Galactic</SelectItem>
+                {getAvailableSkinsForCoromon(coromon).map((skin) => (
+                  <SelectItem key={skin} value={skin}>
+                    {skin}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

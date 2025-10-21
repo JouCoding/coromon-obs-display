@@ -15,7 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { coromonList } from "@shared/coromon-data";
+import { coromonList, generateSpritePath } from "@shared/coromon-data";
+import { SpriteImage } from "./SpriteImage";
 
 interface CoromonSelectorProps {
   value: string | null;
@@ -35,11 +36,22 @@ export function CoromonSelector({ value, onValueChange }: CoromonSelectorProps) 
           className="w-full justify-between font-medium"
           data-testid="button-select-coromon"
         >
-          {value ? value : "Select Coromon..."}
+          <div className="flex items-center gap-2">
+            {value && (
+              <div className="w-6 h-6 flex-shrink-0">
+                <SpriteImage
+                  spritePath={generateSpritePath(value, "A", "None")}
+                  alt={value}
+                  className="w-full h-full"
+                />
+              </div>
+            )}
+            <span>{value ? value : "Select Coromon..."}</span>
+          </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
+      <PopoverContent className="w-[320px] p-0">
         <Command>
           <CommandInput placeholder="Search Coromon..." data-testid="input-search-coromon" />
           <CommandList>
@@ -54,14 +66,22 @@ export function CoromonSelector({ value, onValueChange }: CoromonSelectorProps) 
                     setOpen(false);
                   }}
                   data-testid={`item-coromon-${coromon.toLowerCase()}`}
+                  className="flex items-center gap-2"
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
+                      "h-4 w-4 flex-shrink-0",
                       value === coromon ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {coromon}
+                  <div className="w-8 h-8 flex-shrink-0">
+                    <SpriteImage
+                      spritePath={generateSpritePath(coromon, "A", "None")}
+                      alt={coromon}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <span className="flex-1">{coromon}</span>
                 </CommandItem>
               ))}
             </CommandGroup>

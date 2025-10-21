@@ -1,46 +1,141 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Trash2 } from "lucide-react";
+import { Trash2, Plus, FolderOpen } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 interface ControlBarProps {
   layout: "row" | "grid" | "stack";
   onLayoutChange: (layout: "row" | "grid" | "stack") => void;
   onClearTeam: () => void;
+  currentProfile: string;
+  profiles: string[];
+  onProfileSwitch: (profile: string) => void;
+  onProfileCreate: (name: string) => void;
+  onProfileDelete: (name: string) => void;
 }
 
 export function ControlBar({
   layout,
   onLayoutChange,
   onClearTeam,
+  currentProfile,
+  profiles,
+  onProfileSwitch,
+  onProfileCreate,
+  onProfileDelete,
 }: ControlBarProps) {
+  const [newProfileName, setNewProfileName] = useState("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const handleCreateProfile = () => {
+    if (newProfileName.trim()) {
+      onProfileCreate(newProfileName.trim());
+      setNewProfileName("");
+      setIsCreateDialogOpen(false);
+    }
+  };
+
   return (
-    <div className="border-b bg-card p-4">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-        {/* Layout Selector */}
+    <div className="border-b bg-card">
+      <div className="px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        {/* Profile Selector */}
         <div className="flex items-center gap-4">
-          <Label className="text-sm font-medium">Display Layout:</Label>
+          <Label className="text-sm font-medium">Profile:</Label>
+          <Select value={currentProfile} onValueChange={onProfileSwitch}>
+            <SelectTrigger className="w-[180px]" data-testid="select-profile">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {profiles.map((profile) => (
+                <SelectItem key={profile} value={profile}>
+                  {profile}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" data-testid="button-new-profile">
+                <Plus className="h-4 w-4 mr-2" />
+                New
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Profile</DialogTitle>
+                <DialogDescription>
+                  Enter a name for your new team profile
+                </DialogDescription>
+              </DialogHeader>
+              <Input
+                value={newProfileName}
+                onChange={(e) => setNewProfileName(e.target.value)}
+                placeholder="Profile name"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateProfile();
+                }}
+              />
+              <DialogFooter>
+                <Button onClick={handleCreateProfile}>Create</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {currentProfile !== "default" && (
+            <Button
+              onClick={() => onProfileDelete(currentProfile)}
+              variant="ghost"
+              size="sm"
+              className="text-destructive"
+              data-testid="button-delete-profile"
+            >
+              Delete Profile
+            </Button>
+          )}
+        </div>
+
+        {/* Layout Options */}
+        <div className="flex items-center gap-4">
+          <Label className="text-sm font-medium">Layout:</Label>
           <RadioGroup
             value={layout}
-            onValueChange={(value) =>
-              onLayoutChange(value as "row" | "grid" | "stack")
-            }
+            onValueChange={onLayoutChange}
             className="flex gap-4"
+            data-testid="radio-layout"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="row" id="layout-row" />
+              <RadioGroupItem value="row" id="layout-row" data-testid="radio-layout-row" />
               <Label htmlFor="layout-row" className="cursor-pointer font-normal">
                 Horizontal
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="grid" id="layout-grid" />
+              <RadioGroupItem value="grid" id="layout-grid" data-testid="radio-layout-grid" />
               <Label htmlFor="layout-grid" className="cursor-pointer font-normal">
                 Grid
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="stack" id="layout-stack" />
+              <RadioGroupItem value="stack" id="layout-stack" data-testid="radio-layout-stack" />
               <Label htmlFor="layout-stack" className="cursor-pointer font-normal">
                 Vertical
               </Label>

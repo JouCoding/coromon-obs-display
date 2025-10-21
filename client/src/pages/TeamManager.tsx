@@ -31,33 +31,67 @@ export default function TeamManager() {
     return "grid";
   };
 
+  const getInitialProfile = (): string => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("profile") || "default";
+  };
+
   const [team, setTeam] = useState<Team>(defaultTeam);
   const [layout, setLayout] = useState<"row" | "grid" | "stack">(getInitialLayout());
   const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
-  // Load team from server
-  const loadTeamFromServer = async () => {
+  const [currentProfile, setCurrentProfile] = useState<string>("default");
+  const [profiles, setProfiles] = useState<string[]>(["default"]);
+
+  // Load team from localStorage based on profile
+  const loadTeamFromStorage = (profileName: string) => {
     try {
-      const response = await fetch("/api/team");
-      const data = await response.json();
-      setTeam(data);
+      const stored = localStorage.getItem(`coromon-team-${profileName}`);
+      if (stored) {
+        setTeam(JSON.parse(stored));
+      } else {
+        setTeam(defaultTeam);
+      }
     } catch (e) {
-      console.error("Failed to load team", e);
+      console.error("Failed to load team from storage", e);
+      setTeam(defaultTeam);
     }
   };
 
-  // Load team and check URL parameters on mount
+  // Load profiles list from localStorage
+  const loadProfiles = () => {
+    try {
+      const stored = localStorage.getItem("coromon-profiles");
+      if (stored) {
+        const profileList = JSON.parse(stored);
+        setProfiles(profileList);
+      }
+    } catch (e) {
+      console.error("Failed to load profiles", e);
+    }
+  };
+
+  // Save profiles list to localStorage
+  const saveProfiles = (profileList: string[]) => {
+    try {
+      localStorage.setItem("coromon-profiles", JSON.stringify(profileList));
+      setProfiles(profileList);
+    } catch (e) {
+      console.error("Failed to save profiles", e);
+    }
+  };
+
+  // Load on mount
   useEffect(() => {
-    loadTeamFromServer();
-
-    // Poll server for changes every 2 seconds (for OBS and other browsers)
-    const interval = setInterval(() => {
-      loadTeamFromServer();
-    }, 2000);
-
-    return () => clearInterval(interval);
+    loadProfiles();
+    loadTeamFromStorage(currentProfile);
   }, []);
+
+  // Load team when profile changes
+  useEffect(() => {
+    loadTeamFromStorage(currentProfile);
+  }, [currentProfile]);
 
   // Check if we're in OBS display mode (clean view without UI)
   const isOBSMode = window.location.hash === "#display";
@@ -88,43 +122,93 @@ export default function TeamManager() {
     saveTeam(updatedTeam);
   };
 
-  const saveTeam = async (updatedTeam: Team) => {
+  const saveTeam = (updatedTeam: Team) => {
     try {
-      await fetch("/api/team", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedTeam),
-      });
-      console.log("Team auto-saved");
+      localStorage.setItem(`coromon-team-${currentProfile}`, JSON.stringify(updatedTeam));
+      console.log(`Team auto-saved to profile: ${currentProfile}`);
     } catch (err) {
       console.error("Failed to save team:", err);
-    }
-  };
-
-  const clearTeam = async () => {
-    setTeam(defaultTeam);
-    try {
-      await fetch("/api/team", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(defaultTeam),
-      });
-      toast({
-        title: "Team Cleared",
-        description: "All slots have been emptied.",
-      });
-      console.log("Team cleared");
-    } catch (err) {
       toast({
         title: "Error",
-        description: "Failed to clear team",
+        description: "Failed to save team",
         variant: "destructive",
       });
     }
   };
 
+  const clearTeam = () => {
+    setTeam(defaultTeam);
+    saveTeam(defaultTeam);
+    toast({
+      title: "Team Cleared",
+      description: "All slots have been emptied.",
+    });
+  };
+
+  const createProfile = (profileName: string) => {
+    if (!profileName || profiles.includes(profileName)) {
+      toast({
+        title: "Error",
+        description: "Profile name already exists or is invalid",
+        variant: "destructive",
+      });
+      return;
+    }
+    const newProfiles = [...profiles, profileName];
+    saveProfiles(newProfiles);
+    setCurrentProfile(profileName);
+    toast({
+      title: "Profile Created",
+      description: `New profile "${profileName}" created`,
+    });
+  };
+
+  const deleteProfile = (profileName: string) => {
+    if (profileName === "default") {
+      toast({
+        title: "Error",
+        description: "Cannot delete default profile",
+        variant: "destructive",
+      });
+      return;
+    }
+    const newProfiles = profiles.filter(p => p !== profileName);
+    saveProfiles(newProfiles);
+    localStorage.removeItem(`coromon-team-${profileName}`);
+    if (currentProfile === profileName) {
+      setCurrentProfile("default");
+    }
+    toast({
+      title: "Profile Deleted",
+      description: `Profile "${profileName}" deleted`,
+    });
+  };
+
+  const switchProfile = (profileName: string) => {
+    setCurrentProfile(profileName);
+    toast({
+      title: "Profile Switched",
+      description: `Switched to "${profileName}"`,
+    });
+  };
+
   // If in OBS mode, render only the display
   if (isOBSMode) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      const profileName = getInitialProfile();
+      
+      // Initial load
+      loadTeamFromStorage(profileName);
+      
+      // Poll localStorage for changes
+      const interval = setInterval(() => {
+        loadTeamFromStorage(profileName);
+      }, 500);
+      
+      return () => clearInterval(interval);
+    }, []);
+
     return (
       <div className="h-screen w-screen">
         <OBSDisplay
@@ -142,6 +226,11 @@ export default function TeamManager() {
         layout={layout}
         onLayoutChange={setLayout}
         onClearTeam={clearTeam}
+        currentProfile={currentProfile}
+        profiles={profiles}
+        onProfileSwitch={switchProfile}
+        onProfileCreate={createProfile}
+        onProfileDelete={deleteProfile}
       />
 
       {/* Main Content */}
@@ -203,7 +292,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=row#display`}
+                            value={`${window.location.origin}/?layout=row&profile=${currentProfile}#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -211,7 +300,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row#display`;
+                              const url = `${window.location.origin}/?layout=row&profile=${currentProfile}#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -226,7 +315,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row#display`;
+                              const url = `${window.location.origin}/?layout=row&profile=${currentProfile}#display`;
                               window.open(url, "_blank");
                             }}
                           >
@@ -242,7 +331,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=grid#display`}
+                            value={`${window.location.origin}/?layout=grid&profile=${currentProfile}#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -250,7 +339,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=grid#display`;
+                              const url = `${window.location.origin}/?layout=grid&profile=${currentProfile}#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -265,7 +354,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=grid#display`;
+                              const url = `${window.location.origin}/?layout=grid&profile=${currentProfile}#display`;
                               window.open(url, "_blank");
                             }}
                           >
@@ -281,7 +370,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=stack#display`}
+                            value={`${window.location.origin}/?layout=stack&profile=${currentProfile}#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -289,7 +378,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack#display`;
+                              const url = `${window.location.origin}/?layout=stack&profile=${currentProfile}#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -304,7 +393,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack#display`;
+                              const url = `${window.location.origin}/?layout=stack&profile=${currentProfile}#display`;
                               window.open(url, "_blank");
                             }}
                           >

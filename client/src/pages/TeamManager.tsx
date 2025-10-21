@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Team, defaultTeam, PotentLevel, SpecialSkin } from "@shared/coromon-data";
+import {
+  Team,
+  defaultTeam,
+  PotentLevel,
+  SpecialSkin,
+} from "@shared/coromon-data";
 import { TeamSlotCard } from "@/components/TeamSlotCard";
 import { OBSDisplay } from "@/components/OBSDisplay";
 import { ControlBar } from "@/components/ControlBar";
@@ -30,43 +35,18 @@ export default function TeamManager() {
 
   // Load team and check URL parameters on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const hash = window.location.hash.substring(1);
-    
-    // Load team from server
     loadTeamFromServer();
-
-    // Check URL parameters for OBS browser source configuration
-    if (params.has('layout')) {
-      const layoutParam = params.get('layout') as "row" | "grid" | "stack";
-      if (['row', 'grid', 'stack'].includes(layoutParam)) {
-        setLayout(layoutParam);
-      }
-    }
-    
-    if (params.has('showNames')) {
-      setShowNames(params.get('showNames') === 'true');
-    }
-    
-    if (params.has('transparent')) {
-      setTransparent(params.get('transparent') === 'true');
-    }
-
-    // If hash is 'display', automatically switch to display tab
-    if (hash === 'display') {
-      setActiveTab('display');
-    }
 
     // Poll server for changes every 2 seconds (for OBS and other browsers)
     const interval = setInterval(() => {
       loadTeamFromServer();
     }, 2000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
   // Check if we're in OBS display mode (clean view without UI)
-  const isOBSMode = window.location.hash === '#display';
+  const isOBSMode = window.location.hash === "#display";
 
   const updateSlot = (
     slotNumber: number,
@@ -74,27 +54,34 @@ export default function TeamManager() {
       coromon: string | null;
       potentLevel: PotentLevel;
       specialSkin: SpecialSkin;
-    }>
+    }>,
   ) => {
-    setTeam((prev) => ({
-      slots: prev.slots.map((slot) =>
-        slot.slot === slotNumber ? { ...slot, ...updates } : slot
-      ),
-    }));
+    setTeam((prev) => {
+      const updatedTeam = {
+        ...prev,
+        slots: prev.slots.map((slot) =>
+          slot.slot === slotNumber ? { ...slot, ...updates } : slot,
+        ),
+      };
+
+      // Auto-save the team after any update
+      saveTeam(updatedTeam);
+      return updatedTeam;
+    });
   };
 
-  const saveTeam = async () => {
+  const saveTeam = async (updatedTeam: Team) => {
     try {
       await fetch("/api/team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(team),
+        body: JSON.stringify(updatedTeam),
       });
       toast({
         title: "Team Saved",
         description: "Your Coromon team has been saved successfully.",
       });
-      console.log("Team saved:", team);
+      console.log("Team saved:", updatedTeam);
     } catch (err) {
       toast({
         title: "Error",
@@ -158,9 +145,13 @@ export default function TeamManager() {
                   Split View
                 </TabsTrigger>
               </TabsList>
-              
+
               <Link href="/sprites">
-                <Button variant="outline" size="sm" data-testid="button-manage-sprites">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  data-testid="button-manage-sprites"
+                >
                   <Upload className="h-4 w-4 mr-2" />
                   Manage Sprites
                 </Button>
@@ -173,20 +164,28 @@ export default function TeamManager() {
             <div className="p-6">
               <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold font-[Poppins]">Build Your Team</h2>
+                  <h2 className="text-2xl font-bold font-[Poppins]">
+                    Build Your Team
+                  </h2>
                   <p className="text-muted-foreground">
-                    Select up to 6 Coromon with their potent levels and special skins
+                    Select up to 6 Coromon with their potent levels and special
+                    skins
                   </p>
-                  
+
                   {/* OBS Browser Source Links */}
                   <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-3">
-                    <h3 className="text-sm font-semibold">OBS Browser Source URLs</h3>
+                    <h3 className="text-sm font-semibold">
+                      OBS Browser Source URLs
+                    </h3>
                     <p className="text-xs text-muted-foreground">
-                      Copy these URLs into OBS as Browser Sources. They will automatically update when you save your team changes.
+                      Copy these URLs into OBS as Browser Sources. They will
+                      automatically update when you save your team changes.
                     </p>
                     <div className="space-y-2">
                       <div>
-                        <label className="text-xs text-muted-foreground block mb-1">Horizontal (Row) Layout:</label>
+                        <label className="text-xs text-muted-foreground block mb-1">
+                          Horizontal (Row) Layout:
+                        </label>
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -201,7 +200,11 @@ export default function TeamManager() {
                             onClick={() => {
                               const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true#display`;
                               navigator.clipboard.writeText(url);
-                              toast({ title: "Copied!", description: "Horizontal layout URL copied to clipboard" });
+                              toast({
+                                title: "Copied!",
+                                description:
+                                  "Horizontal layout URL copied to clipboard",
+                              });
                             }}
                           >
                             Copy
@@ -211,7 +214,7 @@ export default function TeamManager() {
                             variant="outline"
                             onClick={() => {
                               const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true#display`;
-                              window.open(url, '_blank');
+                              window.open(url, "_blank");
                             }}
                           >
                             Open
@@ -219,7 +222,9 @@ export default function TeamManager() {
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs text-muted-foreground block mb-1">Vertical (Stack) Layout:</label>
+                        <label className="text-xs text-muted-foreground block mb-1">
+                          Vertical (Stack) Layout:
+                        </label>
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -234,7 +239,11 @@ export default function TeamManager() {
                             onClick={() => {
                               const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`;
                               navigator.clipboard.writeText(url);
-                              toast({ title: "Copied!", description: "Vertical layout URL copied to clipboard" });
+                              toast({
+                                title: "Copied!",
+                                description:
+                                  "Vertical layout URL copied to clipboard",
+                              });
                             }}
                           >
                             Copy
@@ -244,7 +253,7 @@ export default function TeamManager() {
                             variant="outline"
                             onClick={() => {
                               const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`;
-                              window.open(url, '_blank');
+                              window.open(url, "_blank");
                             }}
                           >
                             Open
@@ -295,7 +304,9 @@ export default function TeamManager() {
               <div className="overflow-auto border-r">
                 <div className="p-6">
                   <div className="mb-4">
-                    <h3 className="text-lg font-bold font-[Poppins]">Team Editor</h3>
+                    <h3 className="text-lg font-bold font-[Poppins]">
+                      Team Editor
+                    </h3>
                   </div>
                   <div className="grid gap-4">
                     {team.slots.map((slot) => (

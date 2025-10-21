@@ -1,0 +1,40 @@
+{
+  "slots": [
+    {
+      "slot": 1,
+      "coromon": "Humbee",
+      "potentLevel": "B",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 2,
+      "coromon": "Beezel",
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 3,
+      "coromon": "Sheartooth",
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 4,
+      "coromon": "Humbee",
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 5,
+      "coromon": "Fiddly",
+      "potentLevel": "B",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 6,
+      "coromon": "Humbee",
+      "potentLevel": "A",
+      "specialSkin": "None"
+    }
+  ]
+}

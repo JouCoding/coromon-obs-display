@@ -5,6 +5,12 @@ import {
   PotentLevel,
   SpecialSkin,
 } from "@shared/coromon-data";
+
+declare global {
+  interface Window {
+    saveTeamTimeout?: NodeJS.Timeout;
+  }
+}
 import { TeamSlotCard } from "@/components/TeamSlotCard";
 import { OBSDisplay } from "@/components/OBSDisplay";
 import { ControlBar } from "@/components/ControlBar";
@@ -79,8 +85,14 @@ export default function TeamManager() {
         ),
       };
 
-      // Auto-save the team after any update
-      saveTeam(updatedTeam);
+      // Debounced auto-save
+      if (window.saveTeamTimeout) {
+        clearTimeout(window.saveTeamTimeout);
+      }
+      window.saveTeamTimeout = setTimeout(() => {
+        saveTeam(updatedTeam);
+      }, 500);
+      
       return updatedTeam;
     });
   };
@@ -92,17 +104,9 @@ export default function TeamManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedTeam),
       });
-      toast({
-        title: "Team Saved",
-        description: "Your Coromon team has been saved successfully.",
-      });
-      console.log("Team saved:", updatedTeam);
+      console.log("Team auto-saved");
     } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to save team",
-        variant: "destructive",
-      });
+      console.error("Failed to save team:", err);
     }
   };
 
@@ -147,7 +151,8 @@ export default function TeamManager() {
       <ControlBar
         layout={layout}
         onLayoutChange={setLayout}
-        onSaveTeam={() => saveTeam(team)}
+        showNames={showNames}
+        onShowNamesChange={setShowNames}
         onClearTeam={clearTeam}
       />
 
@@ -189,7 +194,7 @@ export default function TeamManager() {
                   </h2>
                   <p className="text-muted-foreground">
                     Select up to 6 Coromon with their potent levels and special
-                    skins
+                    skins. Changes are auto-saved.
                   </p>
 
                   {/* OBS Browser Source Links */}

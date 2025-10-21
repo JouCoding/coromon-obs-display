@@ -16,9 +16,9 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
     >
       <div
         className={cn(
-          "gap-4",
+          "gap-6",
           layout === "row" && "flex flex-row flex-wrap justify-center",
-          layout === "grid" && "grid grid-cols-3 gap-4",
+          layout === "grid" && "grid grid-cols-3 gap-6",
           layout === "stack" && "flex flex-col"
         )}
       >
@@ -29,17 +29,17 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
             <div
               key={slot.slot}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-2",
-                layout === "row" && "w-28",
-                layout === "grid" && "w-32",
-                layout === "stack" && "w-40 flex-row justify-start"
+                "relative flex flex-col items-center justify-center gap-3",
+                layout === "row" && "w-52",
+                layout === "grid" && "w-52",
+                layout === "stack" && "w-auto flex-row justify-start gap-4"
               )}
               data-testid={`display-slot-${slot.slot}`}
             >
               {/* Sprite Container */}
               <div className={cn(
                 "flex items-center justify-center relative",
-                layout === "stack" ? "w-16 h-16 shrink-0" : "w-20 h-20"
+                layout === "stack" ? "w-40 h-40 shrink-0" : "w-48 h-48"
               )}>
                 {slot.coromon && (
                   <SpriteImage
@@ -56,7 +56,7 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
                   "flex flex-col items-center gap-1",
                   layout === "stack" && "items-start flex-1"
                 )}>
-                  <span className="text-sm font-semibold text-foreground" data-testid={`text-name-${slot.slot}`}>
+                  <span className="text-lg font-semibold text-foreground" data-testid={`text-name-${slot.slot}`}>
                     {slot.coromon}
                   </span>
                 </div>

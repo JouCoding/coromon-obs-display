@@ -1,68 +1,80 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Save, Trash2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+import { Trash2 } from "lucide-react";
 
 interface ControlBarProps {
   layout: "row" | "grid" | "stack";
   onLayoutChange: (layout: "row" | "grid" | "stack") => void;
-  onSaveTeam: () => void;
+  showNames: boolean;
+  onShowNamesChange: (show: boolean) => void;
   onClearTeam: () => void;
 }
 
 export function ControlBar({
   layout,
   onLayoutChange,
-  onSaveTeam,
+  showNames,
+  onShowNamesChange,
   onClearTeam,
 }: ControlBarProps) {
   return (
     <div className="border-b bg-card p-4">
-      <div className="flex flex-wrap items-center gap-6">
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <Button
-            onClick={onSaveTeam}
-            size="sm"
-            data-testid="button-save-team"
+      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+        {/* Layout Selector */}
+        <div className="flex items-center gap-4">
+          <Label className="text-sm font-medium">Display Layout:</Label>
+          <RadioGroup
+            value={layout}
+            onValueChange={(value) =>
+              onLayoutChange(value as "row" | "grid" | "stack")
+            }
+            className="flex gap-4"
           >
-            <Save className="h-4 w-4 mr-2" />
-            Save Team
-          </Button>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="row" id="layout-row" />
+              <Label htmlFor="layout-row" className="cursor-pointer font-normal">
+                Horizontal
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="grid" id="layout-grid" />
+              <Label htmlFor="layout-grid" className="cursor-pointer font-normal">
+                Grid
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="stack" id="layout-stack" />
+              <Label htmlFor="layout-stack" className="cursor-pointer font-normal">
+                Vertical
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="show-names"
+              checked={showNames}
+              onCheckedChange={onShowNamesChange}
+            />
+            <Label htmlFor="show-names" className="cursor-pointer font-normal text-sm">
+              Show Names
+            </Label>
+          </div>
           <Button
             onClick={onClearTeam}
             variant="outline"
             size="sm"
+            className="text-destructive hover:bg-destructive/10"
             data-testid="button-clear-team"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Clear All
+            Clear Team
           </Button>
-        </div>
-
-        <div className="h-6 w-px bg-border" />
-
-        {/* Layout Selector */}
-        <div className="flex items-center gap-2">
-          <Label htmlFor="layout" className="text-sm whitespace-nowrap">
-            OBS Layout
-          </Label>
-          <Select value={layout} onValueChange={(value) => onLayoutChange(value as any)}>
-            <SelectTrigger className="w-32" id="layout" data-testid="select-layout">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="row">Row</SelectItem>
-              <SelectItem value="grid">Grid 3x2</SelectItem>
-              <SelectItem value="stack">Stack</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>

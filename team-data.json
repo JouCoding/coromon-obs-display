@@ -8,7 +8,7 @@
     },
     {
       "slot": 2,
-      "coromon": "Beezel",
+      "coromon": "Armadon",
       "potentLevel": "C",
       "specialSkin": "None"
     },
@@ -20,20 +20,20 @@
     },
     {
       "slot": 4,
-      "coromon": "Humbee",
+      "coromon": "Kyreptil",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 5,
-      "coromon": "Silquill",
+      "coromon": "Molteye",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 6,
-      "coromon": "Silquill",
-      "potentLevel": "A",
+      "coromon": "Mudma",
+      "potentLevel": "C",
       "specialSkin": "None"
     }
   ]

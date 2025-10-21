@@ -6,16 +6,12 @@ interface OBSDisplayProps {
   team: Team;
   layout: "row" | "grid" | "stack";
   showNames: boolean;
-  transparent: boolean;
 }
 
-export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayProps) {
+export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
   return (
     <div
-      className={cn(
-        "w-full h-full flex items-center justify-center p-8",
-        transparent ? "bg-transparent" : "bg-background/90"
-      )}
+      className="w-full h-full flex items-center justify-center p-8 bg-transparent"
       data-testid="display-obs"
     >
       <div

@@ -31,16 +31,9 @@ export default function TeamManager() {
     return showNames === "true";
   };
 
-  const getInitialTransparent = (): boolean => {
-    const params = new URLSearchParams(window.location.search);
-    const transparent = params.get("transparent");
-    return transparent === "true";
-  };
-
   const [team, setTeam] = useState<Team>(defaultTeam);
   const [layout, setLayout] = useState<"row" | "grid" | "stack">(getInitialLayout());
   const [showNames, setShowNames] = useState(getInitialShowNames());
-  const [transparent, setTransparent] = useState(getInitialTransparent());
   const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
@@ -135,49 +128,56 @@ export default function TeamManager() {
     }
   };
 
+  // If in OBS mode, render only the display
+  if (isOBSMode) {
+    return (
+      <div className="h-screen w-screen">
+        <OBSDisplay
+          team={team}
+          layout={layout}
+          showNames={showNames}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen flex flex-col">
-      {/* Control Bar - Hidden in OBS mode */}
-      {!isOBSMode && (
-        <ControlBar
-          layout={layout}
-          onLayoutChange={setLayout}
-          transparent={transparent}
-          onTransparentChange={setTransparent}
-          onSaveTeam={() => saveTeam(team)}
-          onClearTeam={clearTeam}
-        />
-      )}
+      {/* Control Bar */}
+      <ControlBar
+        layout={layout}
+        onLayoutChange={setLayout}
+        onSaveTeam={() => saveTeam(team)}
+        onClearTeam={clearTeam}
+      />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-          {!isOBSMode && (
-            <div className="border-b px-4 flex items-center justify-between">
-              <TabsList>
-                <TabsTrigger value="editor" data-testid="tab-editor">
-                  Team Editor
-                </TabsTrigger>
-                <TabsTrigger value="display" data-testid="tab-display">
-                  OBS Display
-                </TabsTrigger>
-                <TabsTrigger value="split" data-testid="tab-split">
-                  Split View
-                </TabsTrigger>
-              </TabsList>
+          <div className="border-b px-4 flex items-center justify-between">
+            <TabsList>
+              <TabsTrigger value="editor" data-testid="tab-editor">
+                Team Editor
+              </TabsTrigger>
+              <TabsTrigger value="display" data-testid="tab-display">
+                OBS Display
+              </TabsTrigger>
+              <TabsTrigger value="split" data-testid="tab-split">
+                Split View
+              </TabsTrigger>
+            </TabsList>
 
-              <Link href="/sprites">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  data-testid="button-manage-sprites"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Manage Sprites
-                </Button>
-              </Link>
-            </div>
-          )}
+            <Link href="/sprites">
+              <Button
+                variant="outline"
+                size="sm"
+                data-testid="button-manage-sprites"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Manage Sprites
+              </Button>
+            </Link>
+          </div>
 
           {/* Editor Only */}
           <TabsContent value="editor" className="h-full m-0 overflow-auto">
@@ -210,7 +210,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=row&transparent=true#display`}
+                            value={`${window.location.origin}/?layout=row#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -218,7 +218,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=row#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -233,7 +233,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=row#display`;
                               window.open(url, "_blank");
                             }}
                           >
@@ -249,7 +249,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=stack&transparent=true#display`}
+                            value={`${window.location.origin}/?layout=stack#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -257,7 +257,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=stack#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -272,7 +272,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=stack#display`;
                               window.open(url, "_blank");
                             }}
                           >
@@ -313,7 +313,6 @@ export default function TeamManager() {
               team={team}
               layout={layout}
               showNames={showNames}
-              transparent={transparent}
             />
           </TabsContent>
 
@@ -360,7 +359,6 @@ export default function TeamManager() {
                   team={team}
                   layout={layout}
                   showNames={showNames}
-                  transparent={transparent}
                 />
               </div>
             </div>

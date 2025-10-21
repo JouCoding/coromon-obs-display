@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -13,8 +12,6 @@ import { Save, Trash2 } from "lucide-react";
 interface ControlBarProps {
   layout: "row" | "grid" | "stack";
   onLayoutChange: (layout: "row" | "grid" | "stack") => void;
-  transparent: boolean;
-  onTransparentChange: (transparent: boolean) => void;
   onSaveTeam: () => void;
   onClearTeam: () => void;
 }
@@ -22,8 +19,6 @@ interface ControlBarProps {
 export function ControlBar({
   layout,
   onLayoutChange,
-  transparent,
-  onTransparentChange,
   onSaveTeam,
   onClearTeam,
 }: ControlBarProps) {
@@ -68,19 +63,6 @@ export function ControlBar({
               <SelectItem value="stack">Stack</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-
-        {/* Transparent Toggle */}
-        <div className="flex items-center gap-2">
-          <Switch
-            id="transparent"
-            checked={transparent}
-            onCheckedChange={onTransparentChange}
-            data-testid="switch-transparent"
-          />
-          <Label htmlFor="transparent" className="text-sm whitespace-nowrap cursor-pointer">
-            Transparent BG
-          </Label>
         </div>
       </div>
     </div>

@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Upload } from "lucide-react";
 
-const STORAGE_KEY = "coromon-team";
-
 export default function TeamManager() {
   const [team, setTeam] = useState<Team>(defaultTeam);
   const [layout, setLayout] = useState<"row" | "grid" | "stack">("grid");
@@ -19,25 +17,24 @@ export default function TeamManager() {
   const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
-  // Load team from localStorage and check URL parameters on mount
+  // Load team from server
+  const loadTeamFromServer = async () => {
+    try {
+      const response = await fetch("/api/team");
+      const data = await response.json();
+      setTeam(data);
+    } catch (e) {
+      console.error("Failed to load team", e);
+    }
+  };
+
+  // Load team and check URL parameters on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const hash = window.location.hash.substring(1);
     
-    // Load team from localStorage
-    const loadTeamFromStorage = () => {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setTeam(parsed);
-        } catch (e) {
-          console.error("Failed to load saved team", e);
-        }
-      }
-    };
-    
-    loadTeamFromStorage();
+    // Load team from server
+    loadTeamFromServer();
 
     // Check URL parameters for OBS browser source configuration
     if (params.has('layout')) {
@@ -60,15 +57,12 @@ export default function TeamManager() {
       setActiveTab('display');
     }
 
-    // Poll localStorage for changes in OBS mode (every 500ms)
-    const isOBSMode = hash === 'display';
-    if (isOBSMode) {
-      const interval = setInterval(() => {
-        loadTeamFromStorage();
-      }, 500);
-      
-      return () => clearInterval(interval);
-    }
+    // Poll server for changes every 2 seconds (for OBS and other browsers)
+    const interval = setInterval(() => {
+      loadTeamFromServer();
+    }, 2000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Check if we're in OBS display mode (clean view without UI)
@@ -89,23 +83,47 @@ export default function TeamManager() {
     }));
   };
 
-  const saveTeam = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(team));
-    toast({
-      title: "Team Saved",
-      description: "Your Coromon team has been saved successfully.",
-    });
-    console.log("Team saved:", team);
+  const saveTeam = async () => {
+    try {
+      await fetch("/api/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(team),
+      });
+      toast({
+        title: "Team Saved",
+        description: "Your Coromon team has been saved successfully.",
+      });
+      console.log("Team saved:", team);
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to save team",
+        variant: "destructive",
+      });
+    }
   };
 
-  const clearTeam = () => {
+  const clearTeam = async () => {
     setTeam(defaultTeam);
-    localStorage.removeItem(STORAGE_KEY);
-    toast({
-      title: "Team Cleared",
-      description: "All slots have been emptied.",
-    });
-    console.log("Team cleared");
+    try {
+      await fetch("/api/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(defaultTeam),
+      });
+      toast({
+        title: "Team Cleared",
+        description: "All slots have been emptied.",
+      });
+      console.log("Team cleared");
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to clear team",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

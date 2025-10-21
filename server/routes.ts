@@ -33,6 +33,8 @@ const upload = multer({
   }
 });
 
+const TEAM_FILE_PATH = path.join(process.cwd(), "team-data.json");
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Sprite upload endpoint
   app.post('/api/sprites/upload', upload.single('sprite'), async (req, res) => {
@@ -63,6 +65,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ sprites: [] });
     }
   });
+
+  // Load team endpoint
+  app.get("/api/team", async (req, res) => {
+    try {
+      const data = await fs.readFile(TEAM_FILE_PATH, "utf-8");
+      res.json(JSON.parse(data));
+    } catch (err) {
+      // If file doesn't exist, return default team
+      res.json({
+        slots: [
+          { slot: 1, coromon: null, potentLevel: "A", specialSkin: "None" },
+          { slot: 2, coromon: null, potentLevel: "A", specialSkin: "None" },
+          { slot: 3, coromon: null, potentLevel: "A", specialSkin: "None" },
+          { slot: 4, coromon: null, potentLevel: "A", specialSkin: "None" },
+          { slot: 5, coromon: null, potentLevel: "A", specialSkin: "None" },
+          { slot: 6, coromon: null, potentLevel: "A", specialSkin: "None" },
+        ],
+      });
+    }
+  });
+
+  // Save team endpoint
+  app.post("/api/team", async (req, res) => {
+    try {
+      await fs.writeFile(TEAM_FILE_PATH, JSON.stringify(req.body, null, 2));
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Error saving team:", err);
+      res.status(500).json({ error: "Failed to save team" });
+    }
+  });
+
 
   const httpServer = createServer(app);
 

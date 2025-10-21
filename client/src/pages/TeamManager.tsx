@@ -56,6 +56,9 @@ export default function TeamManager() {
     }
   }, []);
 
+  // Check if we're in OBS display mode (clean view without UI)
+  const isOBSMode = window.location.hash === '#display';
+
   const updateSlot = (
     slotNumber: number,
     updates: Partial<{
@@ -92,41 +95,45 @@ export default function TeamManager() {
 
   return (
     <div className="h-screen flex flex-col">
-      {/* Control Bar */}
-      <ControlBar
-        layout={layout}
-        onLayoutChange={setLayout}
-        showNames={showNames}
-        onShowNamesChange={setShowNames}
-        transparent={transparent}
-        onTransparentChange={setTransparent}
-        onSaveTeam={saveTeam}
-        onClearTeam={clearTeam}
-      />
+      {/* Control Bar - Hidden in OBS mode */}
+      {!isOBSMode && (
+        <ControlBar
+          layout={layout}
+          onLayoutChange={setLayout}
+          showNames={showNames}
+          onShowNamesChange={setShowNames}
+          transparent={transparent}
+          onTransparentChange={setTransparent}
+          onSaveTeam={saveTeam}
+          onClearTeam={clearTeam}
+        />
+      )}
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-          <div className="border-b px-4 flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="editor" data-testid="tab-editor">
-                Team Editor
-              </TabsTrigger>
-              <TabsTrigger value="display" data-testid="tab-display">
-                OBS Display
-              </TabsTrigger>
-              <TabsTrigger value="split" data-testid="tab-split">
-                Split View
-              </TabsTrigger>
-            </TabsList>
-            
-            <Link href="/sprites">
-              <Button variant="outline" size="sm" data-testid="button-manage-sprites">
-                <Upload className="h-4 w-4 mr-2" />
-                Manage Sprites
-              </Button>
-            </Link>
-          </div>
+          {!isOBSMode && (
+            <div className="border-b px-4 flex items-center justify-between">
+              <TabsList>
+                <TabsTrigger value="editor" data-testid="tab-editor">
+                  Team Editor
+                </TabsTrigger>
+                <TabsTrigger value="display" data-testid="tab-display">
+                  OBS Display
+                </TabsTrigger>
+                <TabsTrigger value="split" data-testid="tab-split">
+                  Split View
+                </TabsTrigger>
+              </TabsList>
+              
+              <Link href="/sprites">
+                <Button variant="outline" size="sm" data-testid="button-manage-sprites">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Manage Sprites
+                </Button>
+              </Link>
+            </div>
+          )}
 
           {/* Editor Only */}
           <TabsContent value="editor" className="h-full m-0 overflow-auto">

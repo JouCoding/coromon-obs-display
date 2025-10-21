@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -44,9 +45,11 @@ export function TeamSlotCard({
   const availableSkins = getAvailableSkinsForCoromon(coromon, availableSprites);
   
   // Reset skin if current selection is not available
-  if (coromon && specialSkin && !availableSkins.includes(specialSkin)) {
-    onSpecialSkinChange("None");
-  }
+  useEffect(() => {
+    if (coromon && specialSkin && !availableSkins.includes(specialSkin)) {
+      onSpecialSkinChange("None");
+    }
+  }, [coromon, specialSkin, availableSkins, onSpecialSkinChange]);
   
   const spritePath = generateSpritePath(coromon, potentLevel, specialSkin);
 

@@ -12,8 +12,6 @@ interface OBSDisplayProps {
 }
 
 export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayProps) {
-  const filledSlots = team.slots.filter(slot => slot.coromon !== null);
-
   return (
     <div
       className={cn(
@@ -30,15 +28,14 @@ export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayP
           layout === "stack" && "flex flex-col"
         )}
       >
-        {filledSlots.map((slot) => {
+        {team.slots.map((slot) => {
           const spritePath = generateSpritePath(slot.coromon, slot.potentLevel, slot.specialSkin);
           
           return (
             <div
               key={slot.slot}
               className={cn(
-                "relative rounded-lg border backdrop-blur-md flex flex-col items-center justify-center gap-2 p-4",
-                transparent ? "bg-card/80" : "bg-card",
+                "relative flex flex-col items-center justify-center gap-2",
                 layout === "row" && "w-28",
                 layout === "grid" && "w-32",
                 layout === "stack" && "w-40 flex-row justify-start"
@@ -47,21 +44,25 @@ export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayP
             >
               {/* Sprite Container */}
               <div className={cn(
-                "bg-muted/50 rounded-md border flex items-center justify-center relative",
+                "flex items-center justify-center relative",
                 layout === "stack" ? "w-16 h-16 shrink-0" : "w-20 h-20"
               )}>
-                <SpriteImage
-                  spritePath={spritePath}
-                  alt={slot.coromon || "Empty"}
-                  className="w-full h-full"
-                />
-                {slot.potentLevel !== "A" && (
-                  <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-primary" />
+                {slot.coromon && (
+                  <>
+                    <SpriteImage
+                      spritePath={spritePath}
+                      alt={slot.coromon}
+                      className="w-full h-full"
+                    />
+                    {slot.potentLevel !== "A" && (
+                      <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-primary" />
+                    )}
+                  </>
                 )}
               </div>
               
               {/* Name and Info */}
-              {showNames && (
+              {showNames && slot.coromon && (
                 <div className={cn(
                   "flex flex-col items-center gap-1",
                   layout === "stack" && "items-start flex-1"
@@ -86,12 +87,6 @@ export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayP
             </div>
           );
         })}
-        
-        {filledSlots.length === 0 && (
-          <div className="text-center text-muted-foreground p-8">
-            <p>No Coromon in team</p>
-          </div>
-        )}
       </div>
     </div>
   );

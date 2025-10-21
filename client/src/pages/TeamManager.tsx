@@ -16,9 +16,10 @@ export default function TeamManager() {
   const [layout, setLayout] = useState<"row" | "grid" | "stack">("grid");
   const [showNames, setShowNames] = useState(true);
   const [transparent, setTransparent] = useState(false);
+  const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
-  // Load team from localStorage on mount
+  // Load team from localStorage and check URL parameters on mount
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -28,6 +29,30 @@ export default function TeamManager() {
       } catch (e) {
         console.error("Failed to load saved team", e);
       }
+    }
+
+    // Check URL parameters for OBS browser source configuration
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash.substring(1);
+    
+    if (params.has('layout')) {
+      const layoutParam = params.get('layout') as "row" | "grid" | "stack";
+      if (['row', 'grid', 'stack'].includes(layoutParam)) {
+        setLayout(layoutParam);
+      }
+    }
+    
+    if (params.has('showNames')) {
+      setShowNames(params.get('showNames') === 'true');
+    }
+    
+    if (params.has('transparent')) {
+      setTransparent(params.get('transparent') === 'true');
+    }
+
+    // If hash is 'display', automatically switch to display tab
+    if (hash === 'display') {
+      setActiveTab('display');
     }
   }, []);
 
@@ -81,7 +106,7 @@ export default function TeamManager() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
-        <Tabs defaultValue="editor" className="h-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <div className="border-b px-4 flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="editor" data-testid="tab-editor">

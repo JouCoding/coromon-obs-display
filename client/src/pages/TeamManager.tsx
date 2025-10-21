@@ -21,20 +21,31 @@ export default function TeamManager() {
 
   // Load team from localStorage and check URL parameters on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash.substring(1);
+    
+    // First, try to load team from URL parameter (for OBS)
+    if (params.has('team')) {
       try {
-        const parsed = JSON.parse(saved);
-        setTeam(parsed);
+        const teamData = JSON.parse(decodeURIComponent(params.get('team')!));
+        setTeam(teamData);
       } catch (e) {
-        console.error("Failed to load saved team", e);
+        console.error("Failed to parse team from URL", e);
+      }
+    } else {
+      // Fall back to localStorage if no team in URL
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setTeam(parsed);
+        } catch (e) {
+          console.error("Failed to load saved team", e);
+        }
       }
     }
 
     // Check URL parameters for OBS browser source configuration
-    const params = new URLSearchParams(window.location.search);
-    const hash = window.location.hash.substring(1);
-    
     if (params.has('layout')) {
       const layoutParam = params.get('layout') as "row" | "grid" | "stack";
       if (['row', 'grid', 'stack'].includes(layoutParam)) {
@@ -148,6 +159,9 @@ export default function TeamManager() {
                   {/* OBS Browser Source Links */}
                   <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-3">
                     <h3 className="text-sm font-semibold">OBS Browser Source URLs</h3>
+                    <p className="text-xs text-muted-foreground">
+                      These URLs include your current team. Copy and paste into OBS as a Browser Source.
+                    </p>
                     <div className="space-y-2">
                       <div>
                         <label className="text-xs text-muted-foreground block mb-1">Horizontal (Row) Layout:</label>
@@ -155,7 +169,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`}
+                            value={`${window.location.origin}/?layout=row&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -163,7 +177,8 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              navigator.clipboard.writeText(`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`);
+                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              navigator.clipboard.writeText(url);
                               toast({ title: "Copied!", description: "Horizontal layout URL copied to clipboard" });
                             }}
                           >
@@ -172,7 +187,10 @@ export default function TeamManager() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => window.open(`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`, '_blank')}
+                            onClick={() => {
+                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              window.open(url, '_blank');
+                            }}
                           >
                             Open
                           </Button>
@@ -184,7 +202,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`}
+                            value={`${window.location.origin}/?layout=stack&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -192,7 +210,8 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              navigator.clipboard.writeText(`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`);
+                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              navigator.clipboard.writeText(url);
                               toast({ title: "Copied!", description: "Vertical layout URL copied to clipboard" });
                             }}
                           >
@@ -201,7 +220,10 @@ export default function TeamManager() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => window.open(`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`, '_blank')}
+                            onClick={() => {
+                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              window.open(url, '_blank');
+                            }}
                           >
                             Open
                           </Button>

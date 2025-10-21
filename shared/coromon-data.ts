@@ -1,5 +1,11 @@
 
 export const coromonList = [
+  "Toruga",
+  "Embaval",
+  "Volcadon",
+  "Cubzero",
+  "Aroara",
+  "Bearealis",
   "Nibblegar",
   "Sheartooth",
   "Megalobite",
@@ -54,9 +60,6 @@ export const coromonList = [
   "Mudma",
   "Arcta",
   "Arcturos",
-  "Aroara",
-  "Bearealis",
-  "Cubzero",
   "Seraphace",
   "Grimmask",
   "Squidma",
@@ -134,6 +137,12 @@ export const defaultTeam: Team = {
 
 // Map of Coromon to their available special skins based on file analysis
 export const coromonSkinAvailability: Record<string, SpecialSkin[]> = {
+  "Toruga": ["None"],
+  "Embaval": ["None"],
+  "Volcadon": ["None"],
+  "Cubzero": ["None"],
+  "Aroara": ["None"],
+  "Bearealis": ["None"],
   "Nibblegar": ["None", "Chunky"],
   "Sheartooth": ["None", "Chunky"],
   "Megalobite": ["None", "Chunky"],
@@ -188,9 +197,6 @@ export const coromonSkinAvailability: Record<string, SpecialSkin[]> = {
   "Mudma": ["None"],
   "Arcta": ["None", "Crimsonite"],
   "Arcturos": ["None", "Crimsonite"],
-  "Aroara": ["None"],
-  "Bearealis": ["None"],
-  "Cubzero": ["None"],
   "Seraphace": ["None"],
   "Grimmask": ["None"],
   "Squidma": ["None"],

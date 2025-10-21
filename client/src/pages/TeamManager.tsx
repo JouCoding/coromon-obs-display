@@ -24,16 +24,8 @@ export default function TeamManager() {
     const params = new URLSearchParams(window.location.search);
     const hash = window.location.hash.substring(1);
     
-    // First, try to load team from URL parameter (for OBS)
-    if (params.has('team')) {
-      try {
-        const teamData = JSON.parse(decodeURIComponent(params.get('team')!));
-        setTeam(teamData);
-      } catch (e) {
-        console.error("Failed to parse team from URL", e);
-      }
-    } else {
-      // Fall back to localStorage if no team in URL
+    // Load team from localStorage
+    const loadTeamFromStorage = () => {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
@@ -43,7 +35,9 @@ export default function TeamManager() {
           console.error("Failed to load saved team", e);
         }
       }
-    }
+    };
+    
+    loadTeamFromStorage();
 
     // Check URL parameters for OBS browser source configuration
     if (params.has('layout')) {
@@ -64,6 +58,16 @@ export default function TeamManager() {
     // If hash is 'display', automatically switch to display tab
     if (hash === 'display') {
       setActiveTab('display');
+    }
+
+    // Poll localStorage for changes in OBS mode (every 500ms)
+    const isOBSMode = hash === 'display';
+    if (isOBSMode) {
+      const interval = setInterval(() => {
+        loadTeamFromStorage();
+      }, 500);
+      
+      return () => clearInterval(interval);
     }
   }, []);
 
@@ -160,7 +164,7 @@ export default function TeamManager() {
                   <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-3">
                     <h3 className="text-sm font-semibold">OBS Browser Source URLs</h3>
                     <p className="text-xs text-muted-foreground">
-                      These URLs include your current team. Copy and paste into OBS as a Browser Source.
+                      Copy these URLs into OBS as Browser Sources. They will automatically update when you save your team changes.
                     </p>
                     <div className="space-y-2">
                       <div>
@@ -169,7 +173,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=row&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`}
+                            value={`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -177,7 +181,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true#display`;
                               navigator.clipboard.writeText(url);
                               toast({ title: "Copied!", description: "Horizontal layout URL copied to clipboard" });
                             }}
@@ -188,7 +192,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true#display`;
                               window.open(url, '_blank');
                             }}
                           >
@@ -202,7 +206,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=stack&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`}
+                            value={`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -210,7 +214,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`;
                               navigator.clipboard.writeText(url);
                               toast({ title: "Copied!", description: "Vertical layout URL copied to clipboard" });
                             }}
@@ -221,7 +225,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true&team=${encodeURIComponent(JSON.stringify(team))}#display`;
+                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`;
                               window.open(url, '_blank');
                             }}
                           >

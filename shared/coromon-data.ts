@@ -237,8 +237,29 @@ export const coromonSkinAvailability: Record<string, SpecialSkin[]> = {
   "Arctiram": ["None"]
 };
 
-export function getAvailableSkinsForCoromon(coromon: string | null): SpecialSkin[] {
+export function getAvailableSkinsForCoromon(coromon: string | null, availableSprites?: string[]): SpecialSkin[] {
   if (!coromon) return ["None"];
+  
+  // If we have the sprite list, determine skins dynamically
+  if (availableSprites) {
+    const skins = new Set<SpecialSkin>(["None"]);
+    const allSkins: SpecialSkin[] = ["Crimsonite", "Retro", "Dino", "Chunky", "Robot", "Steampunk", "Galactic"];
+    
+    for (const skin of allSkins) {
+      // Check if any potent level exists for this skin
+      const hasA = availableSprites.includes(`${coromon}_${skin}_A.gif`);
+      const hasB = availableSprites.includes(`${coromon}_${skin}_B.gif`);
+      const hasC = availableSprites.includes(`${coromon}_${skin}_C.gif`);
+      
+      if (hasA || hasB || hasC) {
+        skins.add(skin);
+      }
+    }
+    
+    return Array.from(skins);
+  }
+  
+  // Fallback to static mapping
   return coromonSkinAvailability[coromon] || ["None"];
 }
 

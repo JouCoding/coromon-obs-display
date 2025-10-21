@@ -14,6 +14,7 @@ import { SpriteImage } from "./SpriteImage";
 import { PotentLevel, SpecialSkin, generateSpritePath, getAvailableSkinsForCoromon } from "@shared/coromon-data";
 import { Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 
 interface TeamSlotCardProps {
   slotNumber: number;
@@ -34,6 +35,19 @@ export function TeamSlotCard({
   onPotentLevelChange,
   onSpecialSkinChange,
 }: TeamSlotCardProps) {
+  const { data: spritesData } = useQuery({
+    queryKey: ['/api/sprites/list'],
+    refetchInterval: 5000, // Refresh every 5 seconds to pick up new uploads
+  });
+  
+  const availableSprites = spritesData?.sprites || [];
+  const availableSkins = getAvailableSkinsForCoromon(coromon, availableSprites);
+  
+  // Reset skin if current selection is not available
+  if (coromon && specialSkin && !availableSkins.includes(specialSkin)) {
+    onSpecialSkinChange("None");
+  }
+  
   const spritePath = generateSpritePath(coromon, potentLevel, specialSkin);
 
   return (
@@ -130,7 +144,7 @@ export function TeamSlotCard({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {getAvailableSkinsForCoromon(coromon).map((skin) => (
+                {availableSkins.map((skin) => (
                   <SelectItem key={skin} value={skin}>
                     {skin}
                   </SelectItem>

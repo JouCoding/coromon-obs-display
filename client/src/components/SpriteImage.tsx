@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ImageOff } from "lucide-react";
 
@@ -12,6 +12,12 @@ interface SpriteImageProps {
 export function SpriteImage({ spritePath, alt, className, showPath = false }: SpriteImageProps) {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Reset states when sprite path changes
+  useEffect(() => {
+    setImageError(false);
+    setImageLoaded(false);
+  }, [spritePath]);
 
   if (!spritePath) {
     return (
@@ -44,6 +50,7 @@ export function SpriteImage({ spritePath, alt, className, showPath = false }: Sp
         </div>
       )}
       <img
+        key={spriteUrl}
         src={spriteUrl}
         alt={alt}
         className={cn(

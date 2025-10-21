@@ -5,6 +5,9 @@ import { OBSDisplay } from "@/components/OBSDisplay";
 import { ControlBar } from "@/components/ControlBar";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { Upload } from "lucide-react";
 
 const STORAGE_KEY = "coromon-team";
 
@@ -79,7 +82,7 @@ export default function TeamManager() {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs defaultValue="editor" className="h-full">
-          <div className="border-b px-4">
+          <div className="border-b px-4 flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="editor" data-testid="tab-editor">
                 Team Editor
@@ -91,6 +94,13 @@ export default function TeamManager() {
                 Split View
               </TabsTrigger>
             </TabsList>
+            
+            <Link href="/sprites">
+              <Button variant="outline" size="sm" data-testid="button-manage-sprites">
+                <Upload className="h-4 w-4 mr-2" />
+                Manage Sprites
+              </Button>
+            </Link>
           </div>
 
           {/* Editor Only */}

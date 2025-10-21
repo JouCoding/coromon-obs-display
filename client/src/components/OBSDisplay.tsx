@@ -1,5 +1,6 @@
 import { Team, generateSpritePath } from "@shared/coromon-data";
 import { Badge } from "@/components/ui/badge";
+import { SpriteImage } from "./SpriteImage";
 import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,9 +50,11 @@ export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayP
                 "bg-muted/50 rounded-md border flex items-center justify-center relative",
                 layout === "stack" ? "w-16 h-16 shrink-0" : "w-20 h-20"
               )}>
-                <span className="text-[10px] text-muted-foreground font-mono text-center px-1 break-all leading-tight">
-                  {spritePath.split('_')[0]}
-                </span>
+                <SpriteImage
+                  spritePath={spritePath}
+                  alt={slot.coromon || "Empty"}
+                  className="w-full h-full"
+                />
                 {slot.potentLevel !== "A" && (
                   <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-primary" />
                 )}

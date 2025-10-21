@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CoromonSelector } from "./CoromonSelector";
+import { SpriteImage } from "./SpriteImage";
 import { PotentLevel, SpecialSkin, generateSpritePath } from "@shared/coromon-data";
 import { Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,22 +58,30 @@ export function TeamSlotCard({
         </div>
 
         {/* Sprite Preview */}
-        <div className="flex items-center justify-center h-32 rounded-md bg-muted/50 border-2 border-dashed border-border">
+        <div className="relative flex items-center justify-center h-32 rounded-md bg-muted/50 border-2 border-dashed border-border">
           {coromon ? (
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-24 h-24 bg-card rounded-md flex items-center justify-center border">
-                <span className="text-xs text-muted-foreground font-mono" data-testid={`text-sprite-${slotNumber}`}>
-                  {spritePath}
-                </span>
-              </div>
+            <div className="flex flex-col items-center gap-2 w-full h-full p-2">
+              <SpriteImage
+                spritePath={spritePath}
+                alt={coromon}
+                className="flex-1 w-full"
+                showPath={false}
+              />
               {potentLevel !== "A" && (
-                <Sparkles className="h-4 w-4 text-primary" />
+                <Sparkles className="h-4 w-4 text-primary absolute top-2 right-2" />
               )}
             </div>
           ) : (
             <span className="text-sm text-muted-foreground">Empty Slot</span>
           )}
         </div>
+
+        {/* Sprite Filename */}
+        {coromon && (
+          <div className="text-[10px] font-mono text-muted-foreground text-center break-all bg-muted/30 rounded px-2 py-1">
+            {spritePath}
+          </div>
+        )}
 
         {/* Coromon Selector */}
         <div className="space-y-2">

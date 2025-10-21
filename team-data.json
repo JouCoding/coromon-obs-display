@@ -2,38 +2,38 @@
   "slots": [
     {
       "slot": 1,
-      "coromon": "Megalobite",
+      "coromon": "Nibblegar",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 2,
-      "coromon": "Armadon",
-      "potentLevel": "C",
+      "coromon": "Deecie",
+      "potentLevel": "B",
       "specialSkin": "None"
     },
     {
       "slot": 3,
-      "coromon": "Lunarpup",
+      "coromon": null,
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 4,
-      "coromon": "Kyreptil",
+      "coromon": null,
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 5,
-      "coromon": "Molteye",
+      "coromon": "Humbee",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 6,
-      "coromon": "Mudma",
-      "potentLevel": "C",
+      "coromon": null,
+      "potentLevel": "A",
       "specialSkin": "None"
     }
   ]

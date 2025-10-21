@@ -2,8 +2,8 @@
   "slots": [
     {
       "slot": 1,
-      "coromon": "Humbee",
-      "potentLevel": "B",
+      "coromon": "Megalobite",
+      "potentLevel": "A",
       "specialSkin": "None"
     },
     {
@@ -14,25 +14,25 @@
     },
     {
       "slot": 3,
-      "coromon": "Sheartooth",
+      "coromon": null,
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 4,
-      "coromon": "Humbee",
+      "coromon": null,
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 5,
-      "coromon": "Fiddly",
-      "potentLevel": "B",
+      "coromon": null,
+      "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 6,
-      "coromon": "Humbee",
+      "coromon": null,
       "potentLevel": "A",
       "specialSkin": "None"
     }

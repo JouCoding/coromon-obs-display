@@ -15,10 +15,32 @@ import { Link } from "wouter";
 import { Upload } from "lucide-react";
 
 export default function TeamManager() {
+  // Read URL parameters for initial state
+  const getInitialLayout = (): "row" | "grid" | "stack" => {
+    const params = new URLSearchParams(window.location.search);
+    const layout = params.get("layout");
+    if (layout === "row" || layout === "grid" || layout === "stack") {
+      return layout;
+    }
+    return "grid";
+  };
+
+  const getInitialShowNames = (): boolean => {
+    const params = new URLSearchParams(window.location.search);
+    const showNames = params.get("showNames");
+    return showNames === "true";
+  };
+
+  const getInitialTransparent = (): boolean => {
+    const params = new URLSearchParams(window.location.search);
+    const transparent = params.get("transparent");
+    return transparent === "true";
+  };
+
   const [team, setTeam] = useState<Team>(defaultTeam);
-  const [layout, setLayout] = useState<"row" | "grid" | "stack">("grid");
-  const [showNames, setShowNames] = useState(true);
-  const [transparent, setTransparent] = useState(false);
+  const [layout, setLayout] = useState<"row" | "grid" | "stack">(getInitialLayout());
+  const [showNames, setShowNames] = useState(getInitialShowNames());
+  const [transparent, setTransparent] = useState(getInitialTransparent());
   const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
@@ -120,11 +142,9 @@ export default function TeamManager() {
         <ControlBar
           layout={layout}
           onLayoutChange={setLayout}
-          showNames={showNames}
-          onShowNamesChange={setShowNames}
           transparent={transparent}
           onTransparentChange={setTransparent}
-          onSaveTeam={saveTeam}
+          onSaveTeam={() => saveTeam(team)}
           onClearTeam={clearTeam}
         />
       )}
@@ -190,7 +210,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`}
+                            value={`${window.location.origin}/?layout=row&transparent=true#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -198,7 +218,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=row&transparent=true#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -213,7 +233,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=row&showNames=true&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=row&transparent=true#display`;
                               window.open(url, "_blank");
                             }}
                           >
@@ -229,7 +249,7 @@ export default function TeamManager() {
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`}
+                            value={`${window.location.origin}/?layout=stack&transparent=true#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -237,7 +257,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=stack&transparent=true#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
@@ -252,7 +272,7 @@ export default function TeamManager() {
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`;
+                              const url = `${window.location.origin}/?layout=stack&transparent=true#display`;
                               window.open(url, "_blank");
                             }}
                           >

@@ -1,7 +1,5 @@
 import { Team, generateSpritePath } from "@shared/coromon-data";
-import { Badge } from "@/components/ui/badge";
 import { SpriteImage } from "./SpriteImage";
-import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OBSDisplayProps {
@@ -48,20 +46,15 @@ export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayP
                 layout === "stack" ? "w-16 h-16 shrink-0" : "w-20 h-20"
               )}>
                 {slot.coromon && (
-                  <>
-                    <SpriteImage
-                      spritePath={spritePath}
-                      alt={slot.coromon}
-                      className="w-full h-full"
-                    />
-                    {slot.potentLevel !== "A" && (
-                      <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-primary" />
-                    )}
-                  </>
+                  <SpriteImage
+                    spritePath={spritePath}
+                    alt={slot.coromon}
+                    className="w-full h-full"
+                  />
                 )}
               </div>
               
-              {/* Name and Info */}
+              {/* Name */}
               {showNames && slot.coromon && (
                 <div className={cn(
                   "flex flex-col items-center gap-1",
@@ -70,18 +63,6 @@ export function OBSDisplay({ team, layout, showNames, transparent }: OBSDisplayP
                   <span className="text-sm font-semibold text-foreground" data-testid={`text-name-${slot.slot}`}>
                     {slot.coromon}
                   </span>
-                  <div className="flex gap-1 flex-wrap justify-center">
-                    {slot.specialSkin !== "None" && (
-                      <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">
-                        {slot.specialSkin}
-                      </Badge>
-                    )}
-                    {slot.potentLevel !== "A" && (
-                      <Badge variant="secondary" className="text-[10px] px-1 py-0 h-4">
-                        {slot.potentLevel === "B" ? "Potent" : "Perfect"}
-                      </Badge>
-                    )}
-                  </div>
                 </div>
               )}
             </div>

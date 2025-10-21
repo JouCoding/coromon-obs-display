@@ -8,13 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Save, Trash2, Eye, EyeOff } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 
 interface ControlBarProps {
   layout: "row" | "grid" | "stack";
   onLayoutChange: (layout: "row" | "grid" | "stack") => void;
-  showNames: boolean;
-  onShowNamesChange: (show: boolean) => void;
   transparent: boolean;
   onTransparentChange: (transparent: boolean) => void;
   onSaveTeam: () => void;
@@ -24,8 +22,6 @@ interface ControlBarProps {
 export function ControlBar({
   layout,
   onLayoutChange,
-  showNames,
-  onShowNamesChange,
   transparent,
   onTransparentChange,
   onSaveTeam,
@@ -72,20 +68,6 @@ export function ControlBar({
               <SelectItem value="stack">Stack</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-
-        {/* Show Names Toggle */}
-        <div className="flex items-center gap-2">
-          <Switch
-            id="show-names"
-            checked={showNames}
-            onCheckedChange={onShowNamesChange}
-            data-testid="switch-show-names"
-          />
-          <Label htmlFor="show-names" className="text-sm whitespace-nowrap cursor-pointer">
-            {showNames ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-            <span className="ml-1">Show Names</span>
-          </Label>
         </div>
 
         {/* Transparent Toggle */}

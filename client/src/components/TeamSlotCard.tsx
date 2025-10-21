@@ -13,7 +13,7 @@ import {
 import { CoromonSelector } from "./CoromonSelector";
 import { SpriteImage } from "./SpriteImage";
 import { PotentLevel, SpecialSkin, generateSpritePath, getAvailableSkinsForCoromon } from "@shared/coromon-data";
-import { Sparkles, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 
@@ -36,7 +36,7 @@ export function TeamSlotCard({
   onPotentLevelChange,
   onSpecialSkinChange,
 }: TeamSlotCardProps) {
-  const { data: spritesData } = useQuery({
+  const { data: spritesData } = useQuery<{ sprites: string[] }>({
     queryKey: ['/api/sprites/list'],
     refetchInterval: 5000, // Refresh every 5 seconds to pick up new uploads
   });
@@ -84,9 +84,6 @@ export function TeamSlotCard({
                 className="flex-1 w-full"
                 showPath={false}
               />
-              {potentLevel !== "A" && (
-                <Sparkles className="h-4 w-4 text-primary absolute top-2 right-2" />
-              )}
             </div>
           ) : (
             <span className="text-sm text-muted-foreground">Empty Slot</span>

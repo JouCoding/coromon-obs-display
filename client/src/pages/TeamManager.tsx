@@ -31,15 +31,8 @@ export default function TeamManager() {
     return "grid";
   };
 
-  const getInitialShowNames = (): boolean => {
-    const params = new URLSearchParams(window.location.search);
-    const showNames = params.get("showNames");
-    return showNames === "true";
-  };
-
   const [team, setTeam] = useState<Team>(defaultTeam);
   const [layout, setLayout] = useState<"row" | "grid" | "stack">(getInitialLayout());
-  const [showNames, setShowNames] = useState(getInitialShowNames());
   const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
@@ -77,24 +70,23 @@ export default function TeamManager() {
       specialSkin: SpecialSkin;
     }>,
   ) => {
-    setTeam((prev) => {
-      const updatedTeam = {
-        ...prev,
-        slots: prev.slots.map((slot) =>
-          slot.slot === slotNumber ? { ...slot, ...updates } : slot,
-        ),
-      };
+    // Immediately update local state for instant UI response
+    const updatedTeam = {
+      ...team,
+      slots: team.slots.map((slot) =>
+        slot.slot === slotNumber ? { ...slot, ...updates } : slot,
+      ),
+    };
+    
+    setTeam(updatedTeam);
 
-      // Debounced auto-save
-      if (window.saveTeamTimeout) {
-        clearTimeout(window.saveTeamTimeout);
-      }
-      window.saveTeamTimeout = setTimeout(() => {
-        saveTeam(updatedTeam);
-      }, 500);
-      
-      return updatedTeam;
-    });
+    // Debounced auto-save
+    if (window.saveTeamTimeout) {
+      clearTimeout(window.saveTeamTimeout);
+    }
+    window.saveTeamTimeout = setTimeout(() => {
+      saveTeam(updatedTeam);
+    }, 300);
   };
 
   const saveTeam = async (updatedTeam: Team) => {
@@ -139,7 +131,6 @@ export default function TeamManager() {
         <OBSDisplay
           team={team}
           layout={layout}
-          showNames={showNames}
         />
       </div>
     );
@@ -151,8 +142,6 @@ export default function TeamManager() {
       <ControlBar
         layout={layout}
         onLayoutChange={setLayout}
-        showNames={showNames}
-        onShowNamesChange={setShowNames}
         onClearTeam={clearTeam}
       />
 
@@ -248,6 +237,45 @@ export default function TeamManager() {
                       </div>
                       <div>
                         <label className="text-xs text-muted-foreground block mb-1">
+                          Grid Layout:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={`${window.location.origin}/?layout=grid#display`}
+                            className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const url = `${window.location.origin}/?layout=grid#display`;
+                              navigator.clipboard.writeText(url);
+                              toast({
+                                title: "Copied!",
+                                description:
+                                  "Grid layout URL copied to clipboard",
+                              });
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const url = `${window.location.origin}/?layout=grid#display`;
+                              window.open(url, "_blank");
+                            }}
+                          >
+                            Open
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">
                           Vertical (Stack) Layout:
                         </label>
                         <div className="flex gap-2">
@@ -317,7 +345,6 @@ export default function TeamManager() {
             <OBSDisplay
               team={team}
               layout={layout}
-              showNames={showNames}
             />
           </TabsContent>
 
@@ -363,7 +390,6 @@ export default function TeamManager() {
                 <OBSDisplay
                   team={team}
                   layout={layout}
-                  showNames={showNames}
                 />
               </div>
             </div>

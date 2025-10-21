@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 interface OBSDisplayProps {
   team: Team;
   layout: "row" | "grid" | "stack";
-  showNames: boolean;
 }
 
 export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
@@ -49,18 +48,6 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
                   />
                 )}
               </div>
-              
-              {/* Name */}
-              {showNames && slot.coromon && (
-                <div className={cn(
-                  "flex flex-col items-center gap-1",
-                  layout === "stack" && "items-start flex-1"
-                )}>
-                  <span className="text-lg font-semibold text-foreground" data-testid={`text-name-${slot.slot}`}>
-                    {slot.coromon}
-                  </span>
-                </div>
-              )}
             </div>
           );
         })}

@@ -1,22 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
 
 interface ControlBarProps {
   layout: "row" | "grid" | "stack";
   onLayoutChange: (layout: "row" | "grid" | "stack") => void;
-  showNames: boolean;
-  onShowNamesChange: (show: boolean) => void;
   onClearTeam: () => void;
 }
 
 export function ControlBar({
   layout,
   onLayoutChange,
-  showNames,
-  onShowNamesChange,
   onClearTeam,
 }: ControlBarProps) {
   return (
@@ -55,16 +50,6 @@ export function ControlBar({
 
         {/* Action Buttons */}
         <div className="flex gap-4 items-center">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="show-names"
-              checked={showNames}
-              onCheckedChange={onShowNamesChange}
-            />
-            <Label htmlFor="show-names" className="cursor-pointer font-normal text-sm">
-              Show Names
-            </Label>
-          </div>
           <Button
             onClick={onClearTeam}
             variant="outline"

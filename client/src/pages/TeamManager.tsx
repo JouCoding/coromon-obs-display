@@ -80,13 +80,12 @@ export default function TeamManager() {
     
     setTeam(updatedTeam);
 
-    // Debounced auto-save
+    // Debounced auto-save with immediate execution
     if (window.saveTeamTimeout) {
       clearTimeout(window.saveTeamTimeout);
     }
-    window.saveTeamTimeout = setTimeout(() => {
-      saveTeam(updatedTeam);
-    }, 300);
+    // Save immediately to prevent polling from overwriting changes
+    saveTeam(updatedTeam);
   };
 
   const saveTeam = async (updatedTeam: Team) => {
@@ -175,7 +174,7 @@ export default function TeamManager() {
 
           {/* Editor Only */}
           <TabsContent value="editor" className="h-full m-0 overflow-auto">
-            <div className="p-6">
+            <div className="p-6 pb-24">
               <div className="max-w-6xl mx-auto">
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold font-[Poppins]">
@@ -353,7 +352,7 @@ export default function TeamManager() {
             <div className="h-full grid lg:grid-cols-2 gap-0">
               {/* Editor Side */}
               <div className="overflow-auto border-r">
-                <div className="p-6">
+                <div className="p-6 pb-24">
                   <div className="mb-4">
                     <h3 className="text-lg font-bold font-[Poppins]">
                       Team Editor

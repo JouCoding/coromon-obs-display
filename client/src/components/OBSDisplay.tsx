@@ -7,6 +7,8 @@ interface OBSDisplayProps {
   layout: "row" | "grid" | "stack";
 }
 
+const SPRITE_SCALE = 2; // Set scale to 2x or 3x as requested
+
 export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
   return (
     <div
@@ -23,7 +25,7 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
       >
         {team.slots.map((slot) => {
           const spritePath = generateSpritePath(slot.coromon, slot.potentLevel, slot.specialSkin);
-          
+
           return (
             <div
               key={slot.slot}
@@ -44,10 +46,21 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
                   <SpriteImage
                     spritePath={spritePath}
                     alt={slot.coromon}
-                    className="w-full h-full"
+                    className={cn(layout === "stack" ? "w-40 h-40" : "w-48 h-48")}
+                    style={{ transform: `scale(${SPRITE_SCALE})`, transformOrigin: "center" }}
                   />
                 )}
               </div>
+
+              {/* Coromon Name (Optional) */}
+              {showNames && slot.coromon && (
+                <div className={cn(
+                  "text-center text-sm font-bold truncate",
+                  layout === "stack" && "text-left"
+                )}>
+                  {slot.coromon}
+                </div>
+              )}
             </div>
           );
         })}

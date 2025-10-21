@@ -137,6 +137,71 @@ export default function TeamManager() {
                   <p className="text-muted-foreground">
                     Select up to 6 Coromon with their potent levels and special skins
                   </p>
+                  
+                  {/* OBS Browser Source Links */}
+                  <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-3">
+                    <h3 className="text-sm font-semibold">OBS Browser Source URLs</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">Horizontal (Row) Layout:</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`}
+                            className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`);
+                              toast({ title: "Copied!", description: "Horizontal layout URL copied to clipboard" });
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => window.open(`${window.location.origin}/?layout=row&showNames=true&transparent=true#display`, '_blank')}
+                          >
+                            Open
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">Vertical (Stack) Layout:</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`}
+                            className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`);
+                              toast({ title: "Copied!", description: "Vertical layout URL copied to clipboard" });
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => window.open(`${window.location.origin}/?layout=stack&showNames=true&transparent=true#display`, '_blank')}
+                          >
+                            Open
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {team.slots.map((slot) => (

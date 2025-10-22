@@ -48,9 +48,11 @@ export function TeamSlotCard({
     if (!coromon) return ["None"];
     
     const coromonSkins = allSkins.filter(s => s.coromonName === coromon);
-    const skinNames = coromonSkins.map(s => s.skinName);
+    const skinNames = [...new Set(coromonSkins.map(s => s.skinName))];
     
-    return ["None", ...skinNames.filter(name => name !== "None")];
+    // Always include "None" first, then other skins sorted alphabetically
+    const otherSkins = skinNames.filter(name => name !== "None").sort();
+    return ["None", ...otherSkins];
   }, [coromon, allSkins]);
 
   const currentSkinData = useMemo(() => {

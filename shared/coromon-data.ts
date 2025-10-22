@@ -293,26 +293,32 @@ export function generateSpritePath(
 ): string {
   if (!coromon) return "";
 
+  // Handle special skins
   if (specialSkin !== "None" && skinData) {
     const pattern = skinData.pattern || 'standard';
     
     switch (pattern) {
       case 'skin_potent':
+        // Pattern: Coromon_Skin_Potent.gif (e.g., Arcta_Crimsonite_A.gif)
         return `${coromon}_${specialSkin}_${potentLevel}.gif`;
       
       case 'potent_skin_front':
+        // Pattern: Coromon_Potent_Skin_front.gif (e.g., Cubzero_A_snowman_front.gif)
         if (skinData.potentLevels?.includes(potentLevel)) {
           return `${coromon}_${potentLevel}_${specialSkin}_front.gif`;
         }
         return `${coromon}_${skinData.potentLevels?.[0] || 'A'}_${specialSkin}_front.gif`;
       
       case 'skin_front':
+        // Pattern: Coromon_Skin_front.gif (e.g., Shimshell_emerald_front.gif)
         return `${coromon}_${specialSkin}_front.gif`;
       
       default:
+        // Fallback to skin_potent pattern
         return `${coromon}_${specialSkin}_${potentLevel}.gif`;
     }
   }
 
+  // Standard sprite (no special skin)
   return `${coromon}_${potentLevel}.gif`;
 }

@@ -2,21 +2,21 @@
   "slots": [
     {
       "slot": 1,
-      "coromon": "Lemobi",
+      "coromon": "Bearealis",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 2,
-      "coromon": "Serpike",
-      "potentLevel": "A",
-      "specialSkin": "None"
+      "coromon": "Arcturos",
+      "potentLevel": "C",
+      "specialSkin": "Crimsonite"
     },
     {
       "slot": 3,
-      "coromon": "Squidma",
-      "potentLevel": "C",
-      "specialSkin": "None"
+      "coromon": "Magmilus",
+      "potentLevel": "A",
+      "specialSkin": "Crimsonite_B"
     },
     {
       "slot": 4,
@@ -28,13 +28,13 @@
       "slot": 5,
       "coromon": "Magmilus",
       "potentLevel": "A",
-      "specialSkin": "robot"
+      "specialSkin": "None"
     },
     {
       "slot": 6,
-      "coromon": null,
-      "potentLevel": "B",
-      "specialSkin": "GALACTIC"
+      "coromon": "Swurmy",
+      "potentLevel": "C",
+      "specialSkin": "None"
     }
   ]
 }

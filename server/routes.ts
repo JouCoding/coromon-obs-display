@@ -194,10 +194,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Load team endpoint
-  app.get("/api/team", async (req, res) => {
+  // Get profiles list
+  app.get("/api/profiles", async (req, res) => {
     try {
-      const data = await fs.readFile(TEAM_FILE_PATH, "utf-8");
+      const profilesPath = path.join(process.cwd(), "profiles.json");
+      const data = await fs.readFile(profilesPath, "utf-8");
+      res.json(JSON.parse(data));
+    } catch (err) {
+      res.json({ profiles: ["default"] });
+    }
+  });
+
+  // Save profiles list
+  app.post("/api/profiles", async (req, res) => {
+    try {
+      const profilesPath = path.join(process.cwd(), "profiles.json");
+      await fs.writeFile(profilesPath, JSON.stringify(req.body, null, 2));
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Error saving profiles:", err);
+      res.status(500).json({ error: "Failed to save profiles" });
+    }
+  });
+
+  // Load team for a specific profile
+  app.get("/api/team/:profile", async (req, res) => {
+    try {
+      const { profile } = req.params;
+      const teamPath = path.join(process.cwd(), `team-${profile}.json`);
+      const data = await fs.readFile(teamPath, "utf-8");
       res.json(JSON.parse(data));
     } catch (err) {
       // If file doesn't exist, return default team
@@ -214,14 +239,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Save team endpoint
-  app.post("/api/team", async (req, res) => {
+  // Save team for a specific profile
+  app.post("/api/team/:profile", async (req, res) => {
     try {
-      await fs.writeFile(TEAM_FILE_PATH, JSON.stringify(req.body, null, 2));
+      const { profile } = req.params;
+      const teamPath = path.join(process.cwd(), `team-${profile}.json`);
+      await fs.writeFile(teamPath, JSON.stringify(req.body, null, 2));
       res.json({ success: true });
     } catch (err) {
       console.error("Error saving team:", err);
       res.status(500).json({ error: "Failed to save team" });
+    }
+  });
+
+  // Delete team for a specific profile
+  app.delete("/api/team/:profile", async (req, res) => {
+    try {
+      const { profile } = req.params;
+      const teamPath = path.join(process.cwd(), `team-${profile}.json`);
+      await fs.unlink(teamPath);
+      res.json({ success: true });
+    } catch (err) {
+      res.json({ success: true }); // Don't error if file doesn't exist
     }
   });
 

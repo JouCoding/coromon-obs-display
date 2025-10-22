@@ -44,38 +44,43 @@ export default function TeamManager() {
   const [currentProfile, setCurrentProfile] = useState<string>("default");
   const [profiles, setProfiles] = useState<string[]>(["default"]);
 
-  // Load team from localStorage based on profile
-  const loadTeamFromStorage = (profileName: string) => {
+  // Load team from API based on profile
+  const loadTeamFromStorage = async (profileName: string) => {
     try {
-      const stored = localStorage.getItem(`coromon-team-${profileName}`);
-      if (stored) {
-        setTeam(JSON.parse(stored));
+      const response = await fetch(`/api/team/${profileName}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTeam(data);
       } else {
         setTeam(defaultTeam);
       }
     } catch (e) {
-      console.error("Failed to load team from storage", e);
+      console.error("Failed to load team from API", e);
       setTeam(defaultTeam);
     }
   };
 
-  // Load profiles list from localStorage
-  const loadProfiles = () => {
+  // Load profiles list from API
+  const loadProfiles = async () => {
     try {
-      const stored = localStorage.getItem("coromon-profiles");
-      if (stored) {
-        const profileList = JSON.parse(stored);
-        setProfiles(profileList);
+      const response = await fetch('/api/profiles');
+      if (response.ok) {
+        const data = await response.json();
+        setProfiles(data.profiles);
       }
     } catch (e) {
       console.error("Failed to load profiles", e);
     }
   };
 
-  // Save profiles list to localStorage
-  const saveProfiles = (profileList: string[]) => {
+  // Save profiles list to API
+  const saveProfiles = async (profileList: string[]) => {
     try {
-      localStorage.setItem("coromon-profiles", JSON.stringify(profileList));
+      await fetch('/api/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profiles: profileList })
+      });
       setProfiles(profileList);
     } catch (e) {
       console.error("Failed to save profiles", e);
@@ -122,9 +127,13 @@ export default function TeamManager() {
     saveTeam(updatedTeam);
   };
 
-  const saveTeam = (updatedTeam: Team) => {
+  const saveTeam = async (updatedTeam: Team) => {
     try {
-      localStorage.setItem(`coromon-team-${currentProfile}`, JSON.stringify(updatedTeam));
+      await fetch(`/api/team/${currentProfile}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTeam)
+      });
       console.log(`Team auto-saved to profile: ${currentProfile}`);
     } catch (err) {
       console.error("Failed to save team:", err);
@@ -145,7 +154,7 @@ export default function TeamManager() {
     });
   };
 
-  const createProfile = (profileName: string) => {
+  const createProfile = async (profileName: string) => {
     if (!profileName || profiles.includes(profileName)) {
       toast({
         title: "Error",
@@ -155,7 +164,7 @@ export default function TeamManager() {
       return;
     }
     const newProfiles = [...profiles, profileName];
-    saveProfiles(newProfiles);
+    await saveProfiles(newProfiles);
     setCurrentProfile(profileName);
     toast({
       title: "Profile Created",
@@ -163,7 +172,7 @@ export default function TeamManager() {
     });
   };
 
-  const deleteProfile = (profileName: string) => {
+  const deleteProfile = async (profileName: string) => {
     if (profileName === "default") {
       toast({
         title: "Error",
@@ -173,8 +182,8 @@ export default function TeamManager() {
       return;
     }
     const newProfiles = profiles.filter(p => p !== profileName);
-    saveProfiles(newProfiles);
-    localStorage.removeItem(`coromon-team-${profileName}`);
+    await saveProfiles(newProfiles);
+    await fetch(`/api/team/${profileName}`, { method: 'DELETE' });
     if (currentProfile === profileName) {
       setCurrentProfile("default");
     }

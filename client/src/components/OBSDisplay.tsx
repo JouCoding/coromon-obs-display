@@ -1,6 +1,8 @@
 import { Team, generateSpritePath } from "@shared/coromon-data";
 import { SpriteImage } from "./SpriteImage";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import type { Skin } from "@shared/schema";
 
 interface OBSDisplayProps {
   team: Team;
@@ -10,6 +12,13 @@ interface OBSDisplayProps {
 const SPRITE_SCALE = 2; // Set scale to 2x or 3x as requested
 
 export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
+  const { data: skinsData } = useQuery<{ skins: Skin[] }>({
+    queryKey: ['/api/skins'],
+    refetchInterval: 30000,
+  });
+  
+  const allSkins = skinsData?.skins || [];
+
   return (
     <div
       className="w-full h-full flex items-center justify-center p-8 bg-transparent"
@@ -24,7 +33,15 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
         )}
       >
         {team.slots.map((slot) => {
-          const spritePath = generateSpritePath(slot.coromon, slot.potentLevel, slot.specialSkin);
+          const skinData = slot.specialSkin !== "None" && slot.coromon
+            ? allSkins.find(s => s.coromonName === slot.coromon && s.skinName === slot.specialSkin)
+            : undefined;
+
+          const spritePath = generateSpritePath(slot.coromon, slot.potentLevel, slot.specialSkin, {
+            hasPotentVariant: skinData?.hasPotentVariant,
+            potentLevels: skinData?.potentLevels || [],
+            pattern: skinData?.pattern
+          });
 
           return (
             <div

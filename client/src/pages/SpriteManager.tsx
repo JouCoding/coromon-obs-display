@@ -26,6 +26,7 @@ export default function SpriteManager() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [availableSprites, setAvailableSprites] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [scanning, setScanning] = useState(false);
   const { toast } = useToast();
 
   // Load available sprites from server
@@ -116,6 +117,34 @@ export default function SpriteManager() {
   const successCount = uploadedSprites.filter(s => s.status === "success").length;
   const errorCount = uploadedSprites.filter(s => s.status === "error").length;
 
+  const handleScanSprites = async () => {
+    setScanning(true);
+    try {
+      const response = await fetch('/api/skins/scan', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Scan failed');
+      }
+
+      const data = await response.json();
+
+      toast({
+        title: "Scan Complete",
+        description: `Found and indexed ${data.skinsFound} skin variants`,
+      });
+    } catch (error) {
+      toast({
+        title: "Scan Failed",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    } finally {
+      setScanning(false);
+    }
+  };
+
   // Generate list of expected sprites for browsing
   const potentLevels: PotentLevel[] = ["A", "B", "C"];
   const specialSkins: SpecialSkin[] = ["None", "Crimsonite", "Retro", "Dino", "Chunky", "Robot", "Steampunk", "Galactic"];
@@ -162,6 +191,14 @@ export default function SpriteManager() {
               </p>
             </div>
           </div>
+          <Button
+            onClick={handleScanSprites}
+            disabled={scanning}
+            data-testid="button-scan-sprites"
+          >
+            <Search className="h-4 w-4 mr-2" />
+            {scanning ? "Scanning..." : "Scan Sprites"}
+          </Button>
         </div>
       </div>
 

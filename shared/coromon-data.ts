@@ -112,15 +112,7 @@ export const coromonList = [
 ];
 
 export type PotentLevel = "A" | "B" | "C";
-export type SpecialSkin =
-  | "None"
-  | "Crimsonite"
-  | "Retro"
-  | "Dino"
-  | "Chunky"
-  | "Robot"
-  | "Steampunk"
-  | "Galactic";
+export type SpecialSkin = string;
 
 export interface TeamSlot {
   slot: number;
@@ -297,11 +289,29 @@ export function generateSpritePath(
   coromon: string | null,
   potentLevel: PotentLevel,
   specialSkin: SpecialSkin,
+  skinData?: { hasPotentVariant?: boolean; potentLevels?: string[]; pattern?: string }
 ): string {
   if (!coromon) return "";
 
-  if (specialSkin !== "None") {
-    return `${coromon}_${specialSkin}_${potentLevel}.gif`;
+  if (specialSkin !== "None" && skinData) {
+    const pattern = skinData.pattern || 'standard';
+    
+    switch (pattern) {
+      case 'skin_potent':
+        return `${coromon}_${specialSkin}_${potentLevel}.gif`;
+      
+      case 'potent_skin_front':
+        if (skinData.potentLevels?.includes(potentLevel)) {
+          return `${coromon}_${potentLevel}_${specialSkin}_front.gif`;
+        }
+        return `${coromon}_${skinData.potentLevels?.[0] || 'A'}_${specialSkin}_front.gif`;
+      
+      case 'skin_front':
+        return `${coromon}_${specialSkin}_front.gif`;
+      
+      default:
+        return `${coromon}_${specialSkin}_${potentLevel}.gif`;
+    }
   }
 
   return `${coromon}_${potentLevel}.gif`;

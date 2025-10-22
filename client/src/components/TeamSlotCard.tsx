@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/select";
 import { CoromonSelector } from "./CoromonSelector";
 import { SpriteImage } from "./SpriteImage";
-import { PotentLevel, SpecialSkin, generateSpritePath, getAvailableSkinsForCoromon } from "@shared/coromon-data";
+import { PotentLevel, SpecialSkin, generateSpritePath } from "@shared/coromon-data";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import type { Skin } from "@shared/schema";
 
 interface TeamSlotCardProps {
   slotNumber: number;
@@ -36,13 +37,27 @@ export function TeamSlotCard({
   onPotentLevelChange,
   onSpecialSkinChange,
 }: TeamSlotCardProps) {
-  const { data: spritesData } = useQuery<{ sprites: string[] }>({
-    queryKey: ['/api/sprites/list'],
-    refetchInterval: 5000, // Refresh every 5 seconds to pick up new uploads
+  const { data: skinsData } = useQuery<{ skins: Skin[] }>({
+    queryKey: ['/api/skins'],
+    refetchInterval: 30000,
   });
   
-  const availableSprites = spritesData?.sprites || [];
-  const availableSkins = getAvailableSkinsForCoromon(coromon, availableSprites);
+  const allSkins = skinsData?.skins || [];
+  
+  const availableSkins = useMemo(() => {
+    if (!coromon) return ["None"];
+    
+    const coromonSkins = allSkins.filter(s => s.coromonName === coromon);
+    const skinNames = coromonSkins.map(s => s.skinName);
+    
+    return ["None", ...skinNames.filter(name => name !== "None")];
+  }, [coromon, allSkins]);
+
+  const currentSkinData = useMemo(() => {
+    if (!coromon || specialSkin === "None") return undefined;
+    
+    return allSkins.find(s => s.coromonName === coromon && s.skinName === specialSkin);
+  }, [coromon, specialSkin, allSkins]);
   
   // Reset skin if current selection is not available
   useEffect(() => {
@@ -51,7 +66,11 @@ export function TeamSlotCard({
     }
   }, [coromon, specialSkin, availableSkins, onSpecialSkinChange]);
   
-  const spritePath = generateSpritePath(coromon, potentLevel, specialSkin);
+  const spritePath = generateSpritePath(coromon, potentLevel, specialSkin, {
+    hasPotentVariant: currentSkinData?.hasPotentVariant,
+    potentLevels: currentSkinData?.potentLevels || [],
+    pattern: currentSkinData?.pattern
+  });
 
   return (
     <Card className="p-4" data-testid={`card-slot-${slotNumber}`}>

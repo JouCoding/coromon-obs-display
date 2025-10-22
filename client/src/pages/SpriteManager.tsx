@@ -156,19 +156,9 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
 
   // Helper function to check if a coromon has a specific potent level for a given skin
   const hasPotentLevelForSkin = (coromonName: string, potent: PotentLevel, skin: SpecialSkin): boolean => {
-    const coromon = coromonList.find(c => c.name === coromonName);
-    if (!coromon) return false;
-
-    if (skin === "None") {
-      return coromon.potents.includes(potent);
-    } else {
-      // Assuming special skins might not have all potent levels defined directly,
-      // we'll check if the "None" skin has the potent level as a fallback or if
-      // there's specific logic for special skins. For now, let's assume if
-      // the base coromon has the potent, and it's a special skin, it should exist.
-      // A more robust solution might involve a mapping of special skins to their potent availability.
-      return coromon.potents.includes(potent);
-    }
+    // For now, assume all standard potent levels (A, B, C) exist for all coromon
+    // This is a simplified check since coromonList doesn't have potent level metadata
+    return true;
   };
 
 

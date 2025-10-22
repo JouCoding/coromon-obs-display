@@ -8,16 +8,6 @@ import SpriteManager from "@/pages/SpriteManager";
 import NotFound from "@/pages/not-found";
 import { useEffect, useState } from "react";
 
-function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={TeamManager} />
-      <Route path="/sprites" component={SpriteManager} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
-
 function App() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -42,13 +32,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="theme-toggle-container">
-          <Router />
-        </div>
+        <Switch>
+          <Route path="/" component={() => <TeamManager onToggleTheme={toggleTheme} theme={theme} />} />
+          <Route path="/sprites" component={() => <SpriteManager onToggleTheme={toggleTheme} theme={theme} />} />
+          <Route component={NotFound} />
+        </Switch>
         <Toaster />
-        {/* Pass toggleTheme and theme to components that need them */}
-        <Route path="/" component={() => <TeamManager onToggleTheme={toggleTheme} theme={theme} />} />
-        <Route path="/sprites" component={() => <SpriteManager onToggleTheme={toggleTheme} theme={theme} />} />
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -17,6 +17,8 @@ import { ControlBar } from "@/components/ControlBar";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Link } from "wouter";
 import { Upload, Moon, Sun } from "lucide-react";
 
@@ -27,13 +29,13 @@ interface TeamManagerProps {
 
 export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps = {}) {
   // Read URL parameters for initial state
-  const getInitialLayout = (): "row" | "grid" | "stack" => {
+  const getInitialLayout = (): "row" | "grid-2x3" | "grid-3x2" | "stack" => {
     const params = new URLSearchParams(window.location.search);
     const layout = params.get("layout");
-    if (layout === "row" || layout === "grid" || layout === "stack") {
+    if (layout === "row" || layout === "grid-2x3" || layout === "grid-3x2" || layout === "stack") {
       return layout;
     }
-    return "grid";
+    return "grid-2x3";
   };
 
   const getInitialProfile = (): string => {
@@ -42,7 +44,7 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
   };
 
   const [team, setTeam] = useState<Team>(defaultTeam);
-  const [layout, setLayout] = useState<"row" | "grid" | "stack">(getInitialLayout());
+  const [layout, setLayout] = useState<"row" | "grid-2x3" | "grid-3x2" | "stack">(getInitialLayout());
   const [activeTab, setActiveTab] = useState("editor");
   const { toast } = useToast();
 
@@ -239,8 +241,6 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
       <div className="flex items-center gap-2 border-b px-4 py-2">
         <div className="flex-1">
           <ControlBar
-            layout={layout}
-            onLayoutChange={setLayout}
             onClearTeam={clearTeam}
             currentProfile={currentProfile}
             profiles={profiles}
@@ -353,13 +353,13 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
                       </div>
                       <div>
                         <label className="text-xs text-muted-foreground block mb-1">
-                          Grid Layout:
+                          2x3 Grid Layout:
                         </label>
                         <div className="flex gap-2">
                           <input
                             type="text"
                             readOnly
-                            value={`${window.location.origin}/?layout=grid&profile=${currentProfile}#display`}
+                            value={`${window.location.origin}/?layout=grid-2x3&profile=${currentProfile}#display`}
                             className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
                             onClick={(e) => e.currentTarget.select()}
                           />
@@ -367,12 +367,12 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=grid&profile=${currentProfile}#display`;
+                              const url = `${window.location.origin}/?layout=grid-2x3&profile=${currentProfile}#display`;
                               navigator.clipboard.writeText(url);
                               toast({
                                 title: "Copied!",
                                 description:
-                                  "Grid layout URL copied to clipboard",
+                                  "2x3 Grid layout URL copied to clipboard",
                               });
                             }}
                           >
@@ -382,7 +382,46 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              const url = `${window.location.origin}/?layout=grid&profile=${currentProfile}#display`;
+                              const url = `${window.location.origin}/?layout=grid-2x3&profile=${currentProfile}#display`;
+                              window.open(url, "_blank");
+                            }}
+                          >
+                            Open
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground block mb-1">
+                          3x2 Grid Layout:
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            readOnly
+                            value={`${window.location.origin}/?layout=grid-3x2&profile=${currentProfile}#display`}
+                            className="flex-1 text-xs px-3 py-2 bg-background border rounded font-mono"
+                            onClick={(e) => e.currentTarget.select()}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const url = `${window.location.origin}/?layout=grid-3x2&profile=${currentProfile}#display`;
+                              navigator.clipboard.writeText(url);
+                              toast({
+                                title: "Copied!",
+                                description:
+                                  "3x2 Grid layout URL copied to clipboard",
+                              });
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const url = `${window.location.origin}/?layout=grid-3x2&profile=${currentProfile}#display`;
                               window.open(url, "_blank");
                             }}
                           >
@@ -458,6 +497,42 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
 
           {/* Display Only */}
           <TabsContent value="display" className="h-full m-0">
+            <div className="border-b px-4 py-2">
+              <div className="flex items-center gap-4">
+                <Label className="text-sm font-medium">Layout:</Label>
+                <RadioGroup
+                  value={layout}
+                  onValueChange={setLayout}
+                  className="flex gap-4"
+                  data-testid="radio-layout"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="row" id="layout-row" data-testid="radio-layout-row" />
+                    <Label htmlFor="layout-row" className="cursor-pointer font-normal">
+                      Horizontal
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="grid-2x3" id="layout-grid-2x3" data-testid="radio-layout-grid-2x3" />
+                    <Label htmlFor="layout-grid-2x3" className="cursor-pointer font-normal">
+                      2x3 Grid
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="grid-3x2" id="layout-grid-3x2" data-testid="radio-layout-grid-3x2" />
+                    <Label htmlFor="layout-grid-3x2" className="cursor-pointer font-normal">
+                      3x2 Grid
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="stack" id="layout-stack" data-testid="radio-layout-stack" />
+                    <Label htmlFor="layout-stack" className="cursor-pointer font-normal">
+                      Vertical
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
             <OBSDisplay
               team={team}
               layout={layout}
@@ -466,6 +541,42 @@ export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps =
 
           {/* Split View */}
           <TabsContent value="split" className="h-full m-0 overflow-hidden">
+            <div className="border-b px-4 py-2">
+              <div className="flex items-center gap-4">
+                <Label className="text-sm font-medium">Layout:</Label>
+                <RadioGroup
+                  value={layout}
+                  onValueChange={setLayout}
+                  className="flex gap-4"
+                  data-testid="radio-layout"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="row" id="layout-row-split" data-testid="radio-layout-row" />
+                    <Label htmlFor="layout-row-split" className="cursor-pointer font-normal">
+                      Horizontal
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="grid-2x3" id="layout-grid-2x3-split" data-testid="radio-layout-grid-2x3" />
+                    <Label htmlFor="layout-grid-2x3-split" className="cursor-pointer font-normal">
+                      2x3 Grid
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="grid-3x2" id="layout-grid-3x2-split" data-testid="radio-layout-grid-3x2" />
+                    <Label htmlFor="layout-grid-3x2-split" className="cursor-pointer font-normal">
+                      3x2 Grid
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="stack" id="layout-stack-split" data-testid="radio-layout-stack" />
+                    <Label htmlFor="layout-stack-split" className="cursor-pointer font-normal">
+                      Vertical
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </div>
             <div className="h-full grid lg:grid-cols-2 gap-0">
               {/* Editor Side */}
               <div className="overflow-auto border-r">

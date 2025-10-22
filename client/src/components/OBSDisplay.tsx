@@ -6,7 +6,7 @@ import type { Skin } from "@shared/schema";
 
 interface OBSDisplayProps {
   team: Team;
-  layout: "row" | "grid" | "stack";
+  layout: "row" | "grid-2x3" | "grid-3x2" | "stack";
 }
 
 const SPRITE_SCALE = 2; // Set scale to 2x or 3x as requested
@@ -29,7 +29,8 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
         className={cn(
           "gap-6",
           layout === "row" && "flex flex-row flex-wrap justify-center",
-          layout === "grid" && "grid grid-cols-3 gap-6",
+          layout === "grid-2x3" && "grid grid-cols-2 gap-6",
+          layout === "grid-3x2" && "grid grid-cols-3 gap-6",
           layout === "stack" && "flex flex-col"
         )}
       >
@@ -50,7 +51,8 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
               className={cn(
                 "relative flex flex-col items-center justify-center gap-3",
                 layout === "row" && "w-52",
-                layout === "grid" && "w-52",
+                layout === "grid-2x3" && "w-52",
+                layout === "grid-3x2" && "w-52",
                 layout === "stack" && "w-auto flex-row justify-start gap-4"
               )}
               data-testid={`display-slot-${slot.slot}`}

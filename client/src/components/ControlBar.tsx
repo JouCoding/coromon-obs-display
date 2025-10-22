@@ -22,8 +22,6 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
 interface ControlBarProps {
-  layout: "row" | "grid" | "stack";
-  onLayoutChange: (layout: "row" | "grid" | "stack") => void;
   onClearTeam: () => void;
   currentProfile: string;
   profiles: string[];
@@ -33,8 +31,6 @@ interface ControlBarProps {
 }
 
 export function ControlBar({
-  layout,
-  onLayoutChange,
   onClearTeam,
   currentProfile,
   profiles,
@@ -111,36 +107,6 @@ export function ControlBar({
               Delete Profile
             </Button>
           )}
-        </div>
-
-        {/* Layout Options */}
-        <div className="flex items-center gap-4">
-          <Label className="text-sm font-medium">Layout:</Label>
-          <RadioGroup
-            value={layout}
-            onValueChange={onLayoutChange}
-            className="flex gap-4"
-            data-testid="radio-layout"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="row" id="layout-row" data-testid="radio-layout-row" />
-              <Label htmlFor="layout-row" className="cursor-pointer font-normal">
-                Horizontal
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="grid" id="layout-grid" data-testid="radio-layout-grid" />
-              <Label htmlFor="layout-grid" className="cursor-pointer font-normal">
-                Grid
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="stack" id="layout-stack" data-testid="radio-layout-stack" />
-              <Label htmlFor="layout-stack" className="cursor-pointer font-normal">
-                Vertical
-              </Label>
-            </div>
-          </RadioGroup>
         </div>
 
         {/* Action Buttons */}

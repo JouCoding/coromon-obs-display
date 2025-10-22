@@ -1,3 +1,5 @@
+export type LayoutType = "row" | "grid-2x3" | "grid-3x2" | "stack";
+
 export const coromonList = [
   "Cubzero",
   "Aroara",

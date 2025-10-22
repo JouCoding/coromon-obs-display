@@ -4,7 +4,7 @@
       "slot": 1,
       "coromon": "Megalobite",
       "potentLevel": "A",
-      "specialSkin": "chunky"
+      "specialSkin": "None"
     },
     {
       "slot": 2,
@@ -16,7 +16,7 @@
       "slot": 3,
       "coromon": "Volcadon",
       "potentLevel": "B",
-      "specialSkin": "None"
+      "specialSkin": "GALACTIC"
     },
     {
       "slot": 4,
@@ -28,7 +28,7 @@
       "slot": 5,
       "coromon": "Magmilus",
       "potentLevel": "A",
-      "specialSkin": "Crimsonite_B"
+      "specialSkin": "Crimsonite_A"
     },
     {
       "slot": 6,

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, CheckCircle2, XCircle, FileImage, Download, ArrowLeft, Search } from "lucide-react";
+import { Upload, CheckCircle2, XCircle, FileImage, Download, ArrowLeft, Search, Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
@@ -20,7 +20,12 @@ interface UploadedSprite {
   error?: string;
 }
 
-export default function SpriteManager() {
+interface SpriteManagerProps {
+  onToggleTheme?: () => void;
+  theme?: "light" | "dark";
+}
+
+export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerProps = {}) {
   const [uploadedSprites, setUploadedSprites] = useState<UploadedSprite[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -56,7 +61,7 @@ export default function SpriteManager() {
 
     for (let i = 0; i < acceptedFiles.length; i++) {
       const file = acceptedFiles[i];
-      
+
       try {
         if (!file.name.endsWith('.gif')) {
           throw new Error('Only GIF files are supported');
@@ -99,7 +104,7 @@ export default function SpriteManager() {
     }
 
     setUploading(false);
-    
+
     toast({
       title: "Upload Complete",
       description: `Successfully uploaded ${successCount} of ${totalFiles} sprites`,
@@ -148,32 +153,60 @@ export default function SpriteManager() {
   // Generate list of expected sprites for browsing
   const potentLevels: PotentLevel[] = ["A", "B", "C"];
   const specialSkins: SpecialSkin[] = ["None", "Crimsonite", "Retro", "Dino", "Chunky", "Robot", "Steampunk", "Galactic"];
-  
+
+  // Helper function to check if a coromon has a specific potent level for a given skin
+  const hasPotentLevelForSkin = (coromonName: string, potent: PotentLevel, skin: SpecialSkin): boolean => {
+    const coromon = coromonList.find(c => c.name === coromonName);
+    if (!coromon) return false;
+
+    if (skin === "None") {
+      return coromon.potents.includes(potent);
+    } else {
+      // Assuming special skins might not have all potent levels defined directly,
+      // we'll check if the "None" skin has the potent level as a fallback or if
+      // there's specific logic for special skins. For now, let's assume if
+      // the base coromon has the potent, and it's a special skin, it should exist.
+      // A more robust solution might involve a mapping of special skins to their potent availability.
+      return coromon.potents.includes(potent);
+    }
+  };
+
+
   const allPossibleSprites = coromonList.flatMap(coromon =>
     potentLevels.flatMap(potent =>
-      specialSkins.map(skin => ({
-        coromon,
-        potent,
-        skin,
-        filename: generateSpritePath(coromon, potent, skin),
-        exists: availableSprites.includes(generateSpritePath(coromon, potent, skin))
-      }))
+      specialSkins.map(skin => {
+        const spriteFilename = generateSpritePath(coromon.name, potent, skin);
+        // Check if this specific combination of potent and skin is valid for the coromon
+        const isValidCombination = hasPotentLevelForSkin(coromon.name, potent, skin);
+        return {
+          coromon: coromon.name,
+          potent,
+          skin,
+          filename: spriteFilename,
+          exists: availableSprites.includes(spriteFilename),
+          isValid: isValidCombination // Add validity check
+        };
+      })
     )
-  );
+  ).filter(spriteInfo => spriteInfo.isValid); // Filter out combinations that are not valid
+
 
   const filteredSprites = searchQuery
-    ? allPossibleSprites.filter(s => 
+    ? allPossibleSprites.filter(s =>
         s.coromon.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.filename.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : allPossibleSprites.slice(0, 100); // Show first 100 by default
 
   const totalExpected = allPossibleSprites.length;
-  const totalAvailable = availableSprites.length;
-  const coveragePercent = Math.round((totalAvailable / totalExpected) * 100);
+  const totalAvailable = availableSprites.filter(filename =>
+    allPossibleSprites.some(spriteInfo => spriteInfo.filename === filename)
+  ).length;
+  const coveragePercent = totalExpected > 0 ? Math.round((totalAvailable / totalExpected) * 100) : 0;
+
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className={cn("h-screen flex flex-col", theme === "dark" && "dark")}>
       {/* Header */}
       <div className="border-b bg-card p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -191,14 +224,26 @@ export default function SpriteManager() {
               </p>
             </div>
           </div>
-          <Button
-            onClick={handleScanSprites}
-            disabled={scanning}
-            data-testid="button-scan-sprites"
-          >
-            <Search className="h-4 w-4 mr-2" />
-            {scanning ? "Scanning..." : "Scan Sprites"}
-          </Button>
+          <div className="ml-auto flex items-center gap-4">
+            <Button
+              onClick={handleScanSprites}
+              disabled={scanning}
+              data-testid="button-scan-sprites"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              {scanning ? "Scanning..." : "Scan Sprites"}
+            </Button>
+            {onToggleTheme && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={onToggleTheme}
+                data-testid="button-toggle-theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -253,7 +298,7 @@ export default function SpriteManager() {
               <Card
                 {...getRootProps()}
                 className={cn(
-                  "p-12 border-2 border-dashed cursor-pointer transition-all hover-elevate",
+                  "p-12 border-2 border-dashed cursor-pointer transition-all hover:shadow-md",
                   isDragActive && "border-primary bg-primary/5",
                   uploading && "pointer-events-none opacity-50"
                 )}

@@ -61,12 +61,28 @@ export function TeamSlotCard({
     return allSkins.find(s => s.coromonName === coromon && s.skinName === specialSkin);
   }, [coromon, specialSkin, allSkins]);
   
+  // Check if current skin has potent variants
+  const skinHasPotentVariants = useMemo(() => {
+    if (!currentSkinData) return true; // Show potent selection for base sprites
+    return currentSkinData.hasPotentVariant;
+  }, [currentSkinData]);
+  
   // Reset skin if current selection is not available
   useEffect(() => {
     if (coromon && specialSkin && !availableSkins.includes(specialSkin)) {
       onSpecialSkinChange("None");
     }
   }, [coromon, specialSkin, availableSkins, onSpecialSkinChange]);
+  
+  // Reset to available potent level if current one is not available
+  useEffect(() => {
+    if (currentSkinData && !currentSkinData.potentLevels.includes(potentLevel)) {
+      const availableLevel = currentSkinData.potentLevels[0] as PotentLevel;
+      if (availableLevel) {
+        onPotentLevelChange(availableLevel);
+      }
+    }
+  }, [currentSkinData, potentLevel, onPotentLevelChange]);
   
   const spritePath = generateSpritePath(coromon, potentLevel, specialSkin, {
     hasPotentVariant: currentSkinData?.hasPotentVariant,
@@ -125,7 +141,7 @@ export function TeamSlotCard({
         </div>
 
         {/* Potent Level */}
-        {coromon && (
+        {coromon && skinHasPotentVariants && (
           <div className="space-y-2">
             <Label className="text-sm font-medium">Potent Level</Label>
             <RadioGroup
@@ -134,24 +150,30 @@ export function TeamSlotCard({
               className="flex gap-4"
               data-testid={`radio-potent-${slotNumber}`}
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="A" id={`slot-${slotNumber}-a`} data-testid={`radio-potent-a-${slotNumber}`} />
-                <Label htmlFor={`slot-${slotNumber}-a`} className="cursor-pointer font-normal">
-                  Standard (A)
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="B" id={`slot-${slotNumber}-b`} data-testid={`radio-potent-b-${slotNumber}`} />
-                <Label htmlFor={`slot-${slotNumber}-b`} className="cursor-pointer font-normal">
-                  Potent (B)
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="C" id={`slot-${slotNumber}-c`} data-testid={`radio-potent-c-${slotNumber}`} />
-                <Label htmlFor={`slot-${slotNumber}-c`} className="cursor-pointer font-normal">
-                  Perfect (C)
-                </Label>
-              </div>
+              {currentSkinData?.potentLevels.includes('A') !== false && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="A" id={`slot-${slotNumber}-a`} data-testid={`radio-potent-a-${slotNumber}`} />
+                  <Label htmlFor={`slot-${slotNumber}-a`} className="cursor-pointer font-normal">
+                    Standard (A)
+                  </Label>
+                </div>
+              )}
+              {currentSkinData?.potentLevels.includes('B') !== false && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="B" id={`slot-${slotNumber}-b`} data-testid={`radio-potent-b-${slotNumber}`} />
+                  <Label htmlFor={`slot-${slotNumber}-b`} className="cursor-pointer font-normal">
+                    Potent (B)
+                  </Label>
+                </div>
+              )}
+              {currentSkinData?.potentLevels.includes('C') !== false && (
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="C" id={`slot-${slotNumber}-c`} data-testid={`radio-potent-c-${slotNumber}`} />
+                  <Label htmlFor={`slot-${slotNumber}-c`} className="cursor-pointer font-normal">
+                    Perfect (C)
+                  </Label>
+                </div>
+              )}
             </RadioGroup>
           </div>
         )}

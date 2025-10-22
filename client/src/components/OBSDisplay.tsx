@@ -21,7 +21,8 @@ export function OBSDisplay({ team, layout, showNames }: OBSDisplayProps) {
 
   return (
     <div
-      className="w-full h-full flex items-center justify-center p-8 bg-transparent"
+      className="w-full h-full flex items-center justify-center p-8"
+      style={{ background: "transparent" }}
       data-testid="display-obs"
     >
       <div

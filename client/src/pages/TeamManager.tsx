@@ -18,9 +18,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Upload } from "lucide-react";
+import { Upload, Moon, Sun } from "lucide-react";
 
-export default function TeamManager() {
+interface TeamManagerProps {
+  onToggleTheme?: () => void;
+  theme?: "light" | "dark";
+}
+
+export default function TeamManager({ onToggleTheme, theme }: TeamManagerProps = {}) {
   // Read URL parameters for initial state
   const getInitialLayout = (): "row" | "grid" | "stack" => {
     const params = new URLSearchParams(window.location.search);
@@ -231,16 +236,30 @@ export default function TeamManager() {
   return (
     <div className="h-screen flex flex-col">
       {/* Control Bar */}
-      <ControlBar
-        layout={layout}
-        onLayoutChange={setLayout}
-        onClearTeam={clearTeam}
-        currentProfile={currentProfile}
-        profiles={profiles}
-        onProfileSwitch={switchProfile}
-        onProfileCreate={createProfile}
-        onProfileDelete={deleteProfile}
-      />
+      <div className="flex items-center gap-2 border-b px-4 py-2">
+        <div className="flex-1">
+          <ControlBar
+            layout={layout}
+            onLayoutChange={setLayout}
+            onClearTeam={clearTeam}
+            currentProfile={currentProfile}
+            profiles={profiles}
+            onProfileSwitch={switchProfile}
+            onProfileCreate={createProfile}
+            onProfileDelete={deleteProfile}
+          />
+        </div>
+        {onToggleTheme && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleTheme}
+            data-testid="button-toggle-theme"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+        )}
+      </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">

@@ -1,12 +1,12 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Upload, CheckCircle2, XCircle, FileImage, Download, ArrowLeft, Search, Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { cn } from "@/lib/utils";
 
 interface UploadedSprite {
   name: string;
@@ -180,11 +180,7 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        <div className="h-full">
-
-          {/* Upload Tab */}
-          <TabsContent value="upload" className="m-0 p-6 h-full">
-            <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto p-6 space-y-6">
               {/* Instructions */}
               <Card className="p-6 bg-muted/50">
                 <h3 className="font-semibold mb-2">Naming Convention</h3>
@@ -318,6 +314,5 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
           </div>
         </div>
       </div>
-    </div>
   );
 }

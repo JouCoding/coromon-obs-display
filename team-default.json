@@ -2,39 +2,39 @@
   "slots": [
     {
       "slot": 1,
-      "coromon": "Volcadon",
-      "potentLevel": "C",
+      "coromon": "Lemobi",
+      "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 2,
-      "coromon": "Embaval",
+      "coromon": "Serpike",
       "potentLevel": "A",
-      "specialSkin": "GALACTIC"
+      "specialSkin": "None"
     },
     {
       "slot": 3,
-      "coromon": "Cubzero",
-      "potentLevel": "A",
-      "specialSkin": "grizzly"
+      "coromon": "Squidma",
+      "potentLevel": "C",
+      "specialSkin": "None"
     },
     {
       "slot": 4,
-      "coromon": "Beezel",
+      "coromon": "Glacikid",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
       "slot": 5,
-      "coromon": "Megalobite",
+      "coromon": "Magmilus",
       "potentLevel": "A",
-      "specialSkin": "None"
+      "specialSkin": "robot"
     },
     {
       "slot": 6,
-      "coromon": "Atlantern",
+      "coromon": null,
       "potentLevel": "B",
-      "specialSkin": "emerald"
+      "specialSkin": "GALACTIC"
     }
   ]
 }

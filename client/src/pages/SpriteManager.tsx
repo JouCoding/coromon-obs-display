@@ -313,6 +313,5 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
             </div>
           </div>
         </div>
-      </div>
   );
 }

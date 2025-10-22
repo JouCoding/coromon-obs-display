@@ -125,20 +125,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             skinMap.get(key)!.potentLevels.add(potentLevel);
           } else if (parts.length === 3 && ['A', 'B', 'C'].includes(parts[2])) {
-            let coromonName = parts[0];
-            let skinName = parts[1];
+            const coromonName = parts[0];
+            const skinName = parts[1];
             const potentLevel = parts[2];
             
-            if (!knownCoromon.includes(coromonName) && knownCoromon.includes(parts[1])) {
-              coromonName = parts[1];
-              skinName = parts[0];
+            // Only treat as special skin if the coromon name is valid
+            if (knownCoromon.includes(coromonName)) {
+              const key = `${coromonName}:${skinName}`;
+              if (!skinMap.has(key)) {
+                skinMap.set(key, { potentLevels: new Set(), pattern: 'skin_potent', sampleFile: fileName });
+              }
+              skinMap.get(key)!.potentLevels.add(potentLevel);
             }
-            
-            const key = `${coromonName}:${skinName}`;
-            if (!skinMap.has(key)) {
-              skinMap.set(key, { potentLevels: new Set(), pattern: 'skin_potent', sampleFile: fileName });
-            }
-            skinMap.get(key)!.potentLevels.add(potentLevel);
           }
         }
       }

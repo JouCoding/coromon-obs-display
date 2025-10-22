@@ -4,14 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, CheckCircle2, XCircle, FileImage, Download, ArrowLeft, Search, Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { Link } from "wouter";
-import { Input } from "@/components/ui/input";
-import { SpriteImage } from "@/components/SpriteImage";
-import { coromonList, PotentLevel, SpecialSkin, generateSpritePath } from "@shared/coromon-data";
 
 interface UploadedSprite {
   name: string;
@@ -29,18 +24,8 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
   const [uploadedSprites, setUploadedSprites] = useState<UploadedSprite[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [availableSprites, setAvailableSprites] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [scanning, setScanning] = useState(false);
   const { toast } = useToast();
-
-  // Load available sprites from server
-  useEffect(() => {
-    fetch('/api/sprites/list')
-      .then(res => res.json())
-      .then(data => setAvailableSprites(data.sprites || []))
-      .catch(() => setAvailableSprites([]));
-  }, [uploadedSprites]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
@@ -150,50 +135,6 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
     }
   };
 
-  // Generate list of expected sprites for browsing
-  const potentLevels: PotentLevel[] = ["A", "B", "C"];
-  const specialSkins: SpecialSkin[] = ["None", "Crimsonite", "Retro", "Dino", "Chunky", "Robot", "Steampunk", "Galactic"];
-
-  // Helper function to check if a coromon has a specific potent level for a given skin
-  const hasPotentLevelForSkin = (coromonName: string, potent: PotentLevel, skin: SpecialSkin): boolean => {
-    // For now, assume all standard potent levels (A, B, C) exist for all coromon
-    // This is a simplified check since coromonList doesn't have potent level metadata
-    return true;
-  };
-
-
-  const allPossibleSprites = coromonList.flatMap(coromon =>
-    potentLevels.flatMap(potent =>
-      specialSkins.map(skin => {
-        const spriteFilename = generateSpritePath(coromon.name, potent, skin);
-        // Check if this specific combination of potent and skin is valid for the coromon
-        const isValidCombination = hasPotentLevelForSkin(coromon.name, potent, skin);
-        return {
-          coromon: coromon.name,
-          potent,
-          skin,
-          filename: spriteFilename,
-          exists: availableSprites.includes(spriteFilename),
-          isValid: isValidCombination // Add validity check
-        };
-      })
-    )
-  ).filter(spriteInfo => spriteInfo.isValid); // Filter out combinations that are not valid
-
-
-  const filteredSprites = searchQuery
-    ? allPossibleSprites.filter(s =>
-        s.coromon.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.filename.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : allPossibleSprites.slice(0, 100); // Show first 100 by default
-
-  const totalExpected = allPossibleSprites.length;
-  const totalAvailable = availableSprites.filter(filename =>
-    allPossibleSprites.some(spriteInfo => spriteInfo.filename === filename)
-  ).length;
-  const coveragePercent = totalExpected > 0 ? Math.round((totalAvailable / totalExpected) * 100) : 0;
-
 
   return (
     <div className={cn("h-screen flex flex-col", theme === "dark" && "dark")}>
@@ -239,20 +180,10 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        <Tabs defaultValue="upload" className="h-full">
-          <div className="border-b px-4">
-            <TabsList>
-              <TabsTrigger value="upload" data-testid="tab-upload">
-                Upload Sprites
-              </TabsTrigger>
-              <TabsTrigger value="browse" data-testid="tab-browse">
-                Browse & Check ({totalAvailable})
-              </TabsTrigger>
-            </TabsList>
-          </div>
+        <div className="h-full">
 
           {/* Upload Tab */}
-          <TabsContent value="upload" className="m-0 p-6">
+          <TabsContent value="upload" className="m-0 p-6 h-full">
             <div className="max-w-4xl mx-auto space-y-6">
               {/* Instructions */}
               <Card className="p-6 bg-muted/50">
@@ -384,97 +315,8 @@ export default function SpriteManager({ onToggleTheme, theme }: SpriteManagerPro
                 </ol>
               </Card>
             </div>
-          </TabsContent>
-
-          {/* Browse Tab */}
-          <TabsContent value="browse" className="m-0 p-6">
-            <div className="max-w-6xl mx-auto space-y-6">
-              {/* Coverage Stats */}
-              <div className="grid grid-cols-3 gap-4">
-                <Card className="p-4 col-span-2">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Sprite Coverage</span>
-                      <span className="text-2xl font-bold">{coveragePercent}%</span>
-                    </div>
-                    <Progress value={coveragePercent} />
-                    <p className="text-xs text-muted-foreground">
-                      {totalAvailable} of {totalExpected} possible sprite combinations
-                    </p>
-                  </div>
-                </Card>
-                <Card className="p-4">
-                  <div className="flex items-center gap-3">
-                    <FileImage className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-2xl font-bold">{totalAvailable}</p>
-                      <p className="text-sm text-muted-foreground">Available</p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search Coromon or filename..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                  data-testid="input-search-sprites"
-                />
-              </div>
-
-              {/* Sprite Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                {filteredSprites.map((sprite, idx) => (
-                  <Card
-                    key={`${sprite.filename}-${idx}`}
-                    className={cn(
-                      "p-3 relative",
-                      sprite.exists ? "bg-card" : "bg-muted/30 opacity-60"
-                    )}
-                    data-testid={`sprite-card-${idx}`}
-                  >
-                    <div className="aspect-square rounded-md bg-muted/50 border mb-2 overflow-hidden">
-                      <SpriteImage
-                        spritePath={sprite.filename}
-                        alt={sprite.coromon}
-                        className="w-full h-full"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs font-semibold truncate">{sprite.coromon}</p>
-                      <div className="flex gap-1">
-                        <Badge variant="outline" className="text-[9px] px-1 py-0 h-4">
-                          {sprite.potent}
-                        </Badge>
-                        {sprite.skin !== "None" && (
-                          <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4 truncate">
-                            {sprite.skin}
-                          </Badge>
-                        )}
-                      </div>
-                      <Badge
-                        variant={sprite.exists ? "default" : "outline"}
-                        className="text-[9px] px-1 py-0 h-4 w-full justify-center"
-                      >
-                        {sprite.exists ? "Available" : "Missing"}
-                      </Badge>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-
-              {searchQuery && filteredSprites.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
-                  No sprites found matching "{searchQuery}"
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );

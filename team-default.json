@@ -2,25 +2,25 @@
   "slots": [
     {
       "slot": 1,
-      "coromon": "Bearealis",
+      "coromon": "Megalobite",
+      "potentLevel": "A",
+      "specialSkin": "chunky"
+    },
+    {
+      "slot": 2,
+      "coromon": "Purrghast",
       "potentLevel": "A",
       "specialSkin": "None"
     },
     {
-      "slot": 2,
-      "coromon": "Arcturos",
-      "potentLevel": "C",
-      "specialSkin": "Crimsonite"
-    },
-    {
       "slot": 3,
-      "coromon": "Magmilus",
-      "potentLevel": "A",
-      "specialSkin": "Crimsonite_B"
+      "coromon": "Volcadon",
+      "potentLevel": "B",
+      "specialSkin": "None"
     },
     {
       "slot": 4,
-      "coromon": "Glacikid",
+      "coromon": "Dugterra",
       "potentLevel": "A",
       "specialSkin": "None"
     },
@@ -28,12 +28,12 @@
       "slot": 5,
       "coromon": "Magmilus",
       "potentLevel": "A",
-      "specialSkin": "None"
+      "specialSkin": "Crimsonite_B"
     },
     {
       "slot": 6,
-      "coromon": "Swurmy",
-      "potentLevel": "C",
+      "coromon": "Hountrion",
+      "potentLevel": "B",
       "specialSkin": "None"
     }
   ]

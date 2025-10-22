@@ -1,0 +1,40 @@
+{
+  "slots": [
+    {
+      "slot": 1,
+      "coromon": "Volcadon",
+      "potentLevel": "A",
+      "specialSkin": "GALACTIC"
+    },
+    {
+      "slot": 2,
+      "coromon": null,
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 3,
+      "coromon": null,
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 4,
+      "coromon": null,
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 5,
+      "coromon": null,
+      "potentLevel": "A",
+      "specialSkin": "None"
+    },
+    {
+      "slot": 6,
+      "coromon": null,
+      "potentLevel": "A",
+      "specialSkin": "None"
+    }
+  ]
+}

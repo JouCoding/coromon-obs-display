@@ -4,3 +4,14 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# User data files
+team-*.json
+profiles.json
+
+# Temporary files and attachments
+attached_assets/
+/tmp/
+
+# User-uploaded sprites (keep folder structure)
+public/sprites/*.gif
